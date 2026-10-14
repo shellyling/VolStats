@@ -1,0 +1,12 @@
+# GitLab Pages：每次推到預設分支（main）就自動把 index.html 發布成網站
+pages:
+  image: alpine:latest
+  stage: deploy
+  script:
+    - mkdir -p public
+    - cp index.html public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EDA455">
+<title>混排球員數據</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="球員數據">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<!-- 人名讀音比對用（載不到也能用，只是改成逐字比對） -->
+<script defer src="https://cdn.jsdelivr.net/npm/pinyin-pro@3/dist/index.js"></script>
+<style>
+/* ===== 色票：沿用比分站的 70 年代復古卡通風 ===== */
+:root{
+  --ink-line:#22170F; --orange:#EDA455; --orange-deep:#E08A3A; --peach:#F5CB91; --cream:#FAE1B8;
+  --paper:#F3EDE2; --surface:#FFF6E6; --ink:#22170F; --muted:#6E5A48; --rule:#22170F;
+  --shadow:#22170F; --err:#D9573B; --err-bg:#F8D6C8; --ok:#3E8A4F;
+  --head-bg:#EDA455; --head-fg:#22170F; --hero-bg:#FAE1B8; --ray:#F5CB91; --foot-bg:#EDA455; --foot-fg:#22170F;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --display:"Lilita One","Noto Sans TC",sans-serif;
+  --num:"Lilita One","Arial Rounded MT Bold",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#141C33; --surface:#1D2742; --ink:#FAE1B8; --muted:#BFB6A8; --rule:#FAE1B8; --shadow:#E08A3A;
+  --ink-line:#0A0F1E; --err:#F2876B; --err-bg:#4A2430; --ok:#7CC48B;
+  --head-bg:#0E1529; --head-fg:#FAE1B8; --hero-bg:#17203A; --ray:#22305A; --foot-bg:#0E1529; --foot-fg:#BFB6A8;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#141C33; --surface:#1D2742; --ink:#FAE1B8; --muted:#BFB6A8; --rule:#FAE1B8; --shadow:#E08A3A;
+  --ink-line:#0A0F1E; --err:#F2876B; --err-bg:#4A2430; --ok:#7CC48B;
+  --head-bg:#0E1529; --head-fg:#FAE1B8; --hero-bg:#17203A; --ray:#22305A; --foot-bg:#0E1529; --foot-fg:#BFB6A8;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;background-color:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(rgba(34,23,15,.07) 1px,transparent 1.2px),radial-gradient(rgba(34,23,15,.05) 1px,transparent 1.4px);
+  background-size:7px 7px,13px 13px;background-position:0 0,3px 5px;
+  padding-bottom:env(safe-area-inset-bottom,0px)}
+.is-dark body{background-image:radial-gradient(rgba(250,225,184,.05) 1px,transparent 1.2px),radial-gradient(rgba(250,225,184,.035) 1px,transparent 1.4px)}
+body,.site-head,.hero,footer,.box,.tabs,.btn,.pbtn,.abtn,.chip,h2,.stat-tile,table.stand{transition:background-color .3s,color .3s,border-color .3s}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange-deep);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+main{flex:1}
+
+/* ===== 頂部 ===== */
+.site-head{background:var(--head-bg);color:var(--head-fg);border-bottom:3px solid var(--rule);padding-top:env(safe-area-inset-top,0px)}
+.is-dark .site-head{border-bottom-color:var(--orange)}
+.site-head .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:10px}
+.brand{font-weight:900;font-size:18px;letter-spacing:.04em;display:flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;color:inherit}
+.head-r{display:flex;align-items:center;gap:8px;min-width:0}
+.who{display:inline-flex;align-items:center;gap:6px;border:2.5px solid currentColor;border-radius:999px;padding:1px 4px 1px 10px;font-weight:900;font-size:13px;max-width:44vw;background:transparent}
+.who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.is-dark .who button{background:var(--orange);color:#22170F}
+.who button{border:0;background:var(--ink-line);color:#FAE1B8;border-radius:999px;font-size:12px;padding:1px 8px;cursor:pointer;flex:none}
+.theme-btn{position:relative;width:62px;height:34px;flex:none;border-radius:999px;border:2.5px solid #22170F;background:#FAE1B8;cursor:pointer;padding:0;box-shadow:2px 2px 0 #22170F;transition:background-color .3s,border-color .3s}
+.theme-btn .knob{position:absolute;top:2px;left:2px;width:25px;height:25px;border-radius:50%;background:#22170F;color:#F5CB91;display:grid;place-items:center;transition:transform .3s cubic-bezier(.3,1.4,.5,1),background-color .3s}
+.theme-btn .knob svg{grid-area:1/1}
+.theme-btn .i-moon{display:none}
+.is-dark .theme-btn{background:#26335C;border-color:#FAE1B8;box-shadow:2px 2px 0 var(--orange-deep)}
+.is-dark .theme-btn .knob{transform:translateX(28px);background:var(--orange);color:#22170F}
+.is-dark .theme-btn .i-sun{display:none}.is-dark .theme-btn .i-moon{display:block}
+@media (max-width:400px){.brand{font-size:15px}.brand svg{display:none}.theme-btn{width:56px;height:30px}.theme-btn .knob{width:21px;height:21px}.is-dark .theme-btn .knob{transform:translateX(26px)}}
+
+/* ===== 主視覺（登入頁） ===== */
+.hero{position:relative;background:var(--hero-bg);border-bottom:3px solid var(--rule);overflow:hidden}
+.is-dark .hero{border-bottom-color:var(--orange)}
+.hero::before{content:"";position:absolute;left:85%;top:50%;width:1400px;height:1400px;transform:translate(-50%,-50%);
+  background:repeating-conic-gradient(from 0deg,var(--ray) 0 7.5deg,transparent 7.5deg 15deg);opacity:.85;
+  -webkit-mask:radial-gradient(circle,#000 0 25%,transparent 60%);mask:radial-gradient(circle,#000 0 25%,transparent 60%)}
+.hero .wrap{position:relative;padding-top:28px;padding-bottom:30px}
+.edition{font-family:var(--display);font-size:clamp(64px,15vw,120px);line-height:.85;color:var(--orange-deep);-webkit-text-stroke:4px #22170F;paint-order:stroke fill;text-shadow:6px 6px 0 #22170F;display:block;margin-bottom:14px;letter-spacing:.02em}
+.is-dark .edition{-webkit-text-stroke-color:#0A0F1E;text-shadow:6px 6px 0 #0A0F1E}
+@media (prefers-reduced-motion:no-preference){.edition{animation:serve .9s cubic-bezier(.2,.8,.2,1) both}@keyframes serve{from{transform:translateY(-40px);opacity:0}to{transform:none;opacity:1}}}
+.hero h1{font-weight:900;font-size:clamp(26px,5.4vw,40px);line-height:1.3;margin:0;color:#22170F;text-shadow:3px 3px 0 var(--orange)}
+.is-dark .hero h1{color:#FAE1B8;text-shadow:3px 3px 0 #C2621F}
+.tagline{font-family:var(--display);letter-spacing:.12em;margin:10px 0 0;color:#22170F}
+.is-dark .tagline{color:#F5CB91}
+
+/* ===== 共用元件 ===== */
+h2{font-weight:900;letter-spacing:.04em;display:inline-block;background:var(--orange);color:#22170F;font-size:20px;
+  border:2.5px solid var(--rule);border-radius:10px;padding:2px 14px;box-shadow:4px 4px 0 var(--shadow);margin:0 0 16px}
+.box{background:var(--surface);border:2.5px solid var(--rule);border-radius:14px;box-shadow:5px 5px 0 var(--shadow);padding:16px}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:2.5px solid var(--rule);border-radius:10px;background:var(--orange);color:#22170F;font-weight:900;padding:10px 16px;cursor:pointer;box-shadow:3px 3px 0 var(--shadow);font-size:15px;min-height:44px}
+.btn.ghost{background:var(--surface);color:var(--ink)}
+.btn.danger{background:var(--err-bg);color:var(--ink)}
+.btn:active,.pbtn:active,.abtn:active,.seg button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.field{display:block;margin-top:12px}
+.field>span{display:block;font-weight:900;font-size:14px;margin-bottom:4px}
+.field input,.field select,select.inp{width:100%;font:inherit;font-size:17px;padding:10px 12px;border:2.5px solid var(--rule);border-radius:10px;background:var(--paper);color:var(--ink);min-height:48px}
+.banner{border:2.5px solid var(--rule);border-radius:12px;padding:10px 14px;margin:14px 0 0;font-size:14px;background:var(--cream);color:#22170F}
+.is-dark .banner{background:#26335C;color:#FAE1B8}
+.banner.warn{background:var(--err-bg);color:var(--ink)}
+.chip{display:inline-flex;align-items:center;gap:4px;border:2px solid var(--rule);background:var(--surface);color:var(--ink);font-weight:900;font-size:13px;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.tag-ok{background:var(--orange);color:#22170F}
+.tag-err{background:var(--err-bg);color:var(--ink)}
+
+/* ===== 登入 ===== */
+.login{max-width:420px;margin:28px auto 40px}
+.login .code{font-family:var(--num);font-size:30px;letter-spacing:.3em;text-align:center}
+.login .btn{width:100%;margin-top:14px;font-size:18px;min-height:54px}
+.msg{min-height:1.5em;font-weight:700;font-size:14px;margin:10px 0 0}
+.msg.err{color:var(--err)}
+.demo-codes{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin-top:8px}
+.demo-codes button{border:2px solid var(--rule);border-radius:8px;background:var(--surface);color:var(--ink);padding:6px 8px;text-align:left;cursor:pointer;font-size:13px}
+.demo-codes b{font-family:var(--num);font-weight:400;font-size:16px;margin-left:4px}
+
+/* ===== 分頁 + 同步狀態 ===== */
+.tabs{position:sticky;top:0;z-index:20;background:var(--paper);border-bottom:3px solid var(--rule)}
+.tabs .wrap{display:flex;align-items:center;gap:8px;padding-top:8px;padding-bottom:8px}
+.tabs [role=tab]{border:2.5px solid var(--rule);border-radius:999px;padding:6px 18px;background:var(--surface);color:var(--ink);font-weight:900;cursor:pointer;min-height:40px}
+.tabs [role=tab][aria-selected="true"]{background:var(--orange);color:#22170F;box-shadow:3px 3px 0 var(--shadow)}
+.sync{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);font-weight:700;border:0;background:none;cursor:pointer;padding:4px;text-align:right}
+.sync::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;background:#9AA8BD}
+.sync.ok::before{background:#16A34A;box-shadow:0 0 0 4px rgba(22,163,74,.18)}
+.sync.wait::before{background:var(--orange-deep);box-shadow:0 0 0 4px rgba(224,138,58,.25)}
+.sync.off::before{background:var(--err)}
+.panel{padding:20px 0 120px}
+
+/* ===== 紀錄頁 ===== */
+.ctl{display:grid;gap:10px}
+.ctl-row{display:flex;gap:8px;align-items:center}
+.ctl-row>select{flex:1;min-width:0}
+.ctl-row .lbl{font-weight:900;font-size:14px;flex:none;width:3em}
+.seg{display:inline-flex;border:2.5px solid var(--rule);border-radius:10px;overflow:hidden;flex:none;box-shadow:3px 3px 0 var(--shadow)}
+.seg button{border:0;border-right:2px solid var(--rule);background:var(--surface);color:var(--ink);font-weight:900;min-width:48px;min-height:44px;padding:0 12px;cursor:pointer;font-size:16px}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--orange);color:#22170F}
+.seg.small button{min-height:38px;font-size:14px;min-width:0}
+
+.voice{margin-top:16px;width:100%;min-height:104px;border:3px solid var(--rule);border-radius:18px;background:var(--orange);color:#22170F;
+  box-shadow:6px 6px 0 var(--shadow);display:flex;align-items:center;justify-content:center;gap:14px;font-weight:900;font-size:22px;cursor:pointer;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.voice svg{flex:none}
+.voice small{display:block;font-size:13px;font-weight:700;opacity:.8}
+.voice.on{background:var(--err);color:#fff;transform:translate(3px,3px);box-shadow:3px 3px 0 var(--shadow)}
+@media (prefers-reduced-motion:no-preference){.voice.on svg{animation:pulse 1s ease-in-out infinite}@keyframes pulse{50%{transform:scale(1.18)}}}
+.heard{min-height:1.6em;margin:10px 2px 0;font-size:15px;color:var(--muted);font-weight:700;text-align:center}
+.heard b{color:var(--ink)}
+
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:22px 0 10px}
+.sec-h h3{margin:0;font-size:16px;font-weight:900}
+.sec-h small{color:var(--muted);font-size:12px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(132px,30%),1fr));gap:10px}
+.pbtn{position:relative;min-height:64px;border:2.5px solid var(--ink-line);border-radius:12px;background:var(--tc);color:var(--tf);font-weight:900;font-size:18px;
+  box-shadow:3px 3px 0 var(--shadow);cursor:pointer;padding:6px;line-height:1.2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;word-break:break-all}
+.pbtn .no{font-family:var(--num);font-weight:400;font-size:26px;line-height:1}
+.pbtn small{font-size:12px;font-weight:700;opacity:.85}
+.pbtn[aria-pressed="true"],.abtn[aria-pressed="true"]{outline:4px solid var(--ink);outline-offset:2px;transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--shadow)}
+.pbtn[aria-pressed="true"]::after,.abtn[aria-pressed="true"]::after{content:"✓";position:absolute;top:-10px;right:-8px;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:14px;display:grid;place-items:center;border:2px solid var(--paper)}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(132px,30%),1fr));gap:10px}
+.agrp{font-size:13px;font-weight:900;margin:14px 0 6px;display:flex;align-items:center;gap:6px}
+.agrp::before{content:"";width:14px;height:14px;border-radius:4px;border:2px solid var(--rule);background:var(--c)}
+.abtn{position:relative;min-height:58px;border:2.5px solid var(--rule);border-radius:12px;font-weight:900;font-size:17px;cursor:pointer;box-shadow:3px 3px 0 var(--shadow);padding:4px}
+.abtn.pt{background:var(--orange);color:#22170F}
+.abtn.er{background:var(--err-bg);color:var(--ink);border-style:dashed}
+.hint{font-size:13px;color:var(--muted);margin:8px 0 0;text-align:center;font-weight:700}
+
+.recent{list-style:none;margin:0;padding:0}
+.recent li{display:flex;align-items:center;gap:8px;padding:10px 4px;border-bottom:2px dashed color-mix(in srgb,var(--rule) 30%,transparent)}
+.recent li:last-child{border-bottom:0}
+.recent .dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink-line);flex:none}
+.recent .txt{flex:1;min-width:0;font-weight:700}
+.recent .txt small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.recent .val{font-family:var(--num);font-size:18px;flex:none}
+.recent .val.pt{color:var(--orange-deep)}.recent .val.er{color:var(--err)}
+.recent li.undone .txt{text-decoration:line-through;opacity:.5}
+.recent button{border:2px solid var(--rule);background:var(--surface);color:var(--ink);border-radius:8px;font-weight:900;font-size:13px;padding:6px 10px;cursor:pointer;flex:none;min-height:36px}
+.empty{text-align:center;padding:24px 12px;color:var(--muted);font-weight:700;border:3px dashed var(--rule);border-radius:14px;background:var(--surface)}
+
+/* 確認卡片 */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:0 12px calc(12px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.card{pointer-events:auto;max-width:560px;margin:0 auto;background:var(--surface);border:3px solid var(--rule);border-radius:18px;box-shadow:6px 6px 0 var(--shadow);padding:14px 16px 16px;position:relative;overflow:hidden}
+@media (prefers-reduced-motion:no-preference){.card{animation:up .22s cubic-bezier(.2,.9,.3,1.2)}@keyframes up{from{transform:translateY(60px);opacity:0}}}
+.card .bar{position:absolute;left:0;top:0;height:6px;background:var(--orange-deep);width:100%}
+.card .said{font-size:13px;color:var(--muted);font-weight:700;margin:2px 0 6px}
+.card .what{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:24px;font-weight:900;line-height:1.3}
+.card .what .tp{display:inline-block;background:var(--tc);color:var(--tf);border:2.5px solid var(--ink-line);border-radius:10px;padding:2px 12px;box-shadow:2px 2px 0 var(--ink-line)}
+.card .q{font-weight:900;font-size:16px;margin:4px 0 8px}
+.card .opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:8px}
+.card .opts .pbtn,.card .opts .abtn{min-height:52px;font-size:16px}
+.card .acts{display:flex;gap:10px;margin-top:14px}
+.card .acts .btn{flex:1;min-height:52px;font-size:17px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--paper);border-radius:999px;padding:10px 8px 10px 18px;font-weight:900;font-size:15px;display:flex;align-items:center;gap:12px;box-shadow:4px 4px 0 var(--orange-deep);max-width:calc(100vw - 24px)}
+.toast span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toast button{border:0;border-radius:999px;background:var(--orange);color:#22170F;font-weight:900;padding:6px 12px;cursor:pointer;flex:none}
+
+dialog{border:3px solid var(--rule);border-radius:16px;background:var(--surface);color:var(--ink);box-shadow:6px 6px 0 var(--shadow);padding:18px;width:min(420px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(20,16,10,.55)}
+dialog h3{margin:0 0 4px;font-size:20px;font-weight:900}
+dialog .acts{display:flex;gap:10px;margin-top:18px}
+dialog .acts .btn{flex:1}
+
+/* ===== 數據頁 ===== */
+.filters{display:flex;gap:8px;overflow-x:auto;padding:2px 6px 8px 2px;margin-bottom:6px;scrollbar-width:thin}
+.filters button{flex:none;border:2.5px solid var(--rule);border-radius:999px;background:var(--surface);color:var(--ink);font-weight:900;font-size:14px;padding:6px 14px;cursor:pointer;min-height:40px;white-space:nowrap}
+.filters button[aria-pressed="true"]{background:var(--orange);color:#22170F;box-shadow:3px 3px 0 var(--shadow)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 20px}
+.stat-tile{border:2.5px solid var(--rule);border-radius:14px;background:var(--surface);box-shadow:4px 4px 0 var(--shadow);padding:10px 12px;text-align:center}
+.stat-tile small{display:block;font-weight:900;font-size:13px;color:var(--muted)}
+.stat-tile b{display:block;font-family:var(--num);font-weight:400;font-size:clamp(30px,8vw,40px);line-height:1.1}
+.stat-tile.pt b{color:var(--orange-deep)}.stat-tile.er b{color:var(--err)}
+.tbl-scroll{overflow-x:auto;padding:0 6px 8px 0}
+table.stand{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:2.5px solid var(--rule);border-radius:14px;overflow:hidden;box-shadow:5px 5px 0 var(--shadow)}
+.stand th,.stand td{padding:10px 10px;text-align:left;border-bottom:1.5px solid color-mix(in srgb,var(--rule) 25%,transparent)}
+.stand th{font-weight:900;font-size:13px;background:var(--peach);color:#22170F;white-space:nowrap}
+.stand tr:last-child td{border-bottom:0}
+.stand .n{text-align:center;font-family:var(--num);font-size:20px;white-space:nowrap}
+.stand th.n{font-family:var(--sans);font-size:13px}
+.stand .n.pos{color:var(--orange-deep)}.stand .n.neg{color:var(--err)}
+.stand .pl{display:flex;align-items:center;gap:8px;font-weight:900}
+.stand .pl i{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink-line);flex:none}
+.stand .pl small{color:var(--muted);font-weight:500;font-size:12px}
+.stand tr.row{cursor:pointer}
+.stand tr.detail td{background:var(--paper);font-size:13px;padding-top:6px}
+.brk{display:flex;flex-wrap:wrap;gap:6px}
+.stand tr.zero td{opacity:.5}
+
+.login-grid{display:grid;gap:22px;max-width:900px;margin:28px auto 0}
+@media (min-width:760px){.login-grid{grid-template-columns:1fr 1fr;align-items:start}}
+.login-grid .login{max-width:none;margin:0}
+.login-extra{max-width:900px;margin:0 auto 40px}
+.swatches{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+.sw{position:relative;width:42px;height:42px;border-radius:50%;border:2.5px solid var(--ink-line);background:var(--c);cursor:pointer;box-shadow:2px 2px 0 var(--shadow);padding:0}
+.sw[aria-checked="true"]{outline:3px solid var(--ink);outline-offset:3px}
+.sw[aria-checked="true"]::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;font-weight:900;color:var(--f);font-size:18px}
+.bigcode{font-family:var(--num);font-size:clamp(40px,12vw,56px);letter-spacing:.18em;text-align:center;background:var(--paper);border:2.5px dashed var(--rule);border-radius:12px;padding:8px 0 4px 0.18em;margin:6px 0 12px;user-select:all;-webkit-user-select:all}
+.row-btns{display:flex;gap:10px;flex-wrap:wrap}.row-btns .btn{flex:1;min-width:88px}
+.add-grid{display:grid;grid-template-columns:2fr 1fr;gap:10px}
+.plist{list-style:none;margin:0;padding:0}
+.plist li{display:flex;align-items:center;gap:10px;padding:10px 4px;border-bottom:2px dashed color-mix(in srgb,var(--rule) 30%,transparent)}
+.plist li:last-child{border-bottom:0}
+.plist .dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--ink-line);flex:none}
+.plist .no{font-family:var(--num);font-size:20px;min-width:2em;text-align:center;flex:none}
+.plist .nm{flex:1;min-width:0;font-weight:900}
+.plist .nm small{display:block;font-weight:500;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plist li.off .nm,.plist li.off .no,.plist li.off .dot{opacity:.4}
+.plist button{border:2px solid var(--rule);background:var(--surface);color:var(--ink);border-radius:8px;font-weight:900;font-size:13px;padding:6px 10px;cursor:pointer;flex:none;min-height:36px}
+.check{display:flex;align-items:center;gap:10px;margin-top:16px;font-weight:700;font-size:15px}
+.check input{width:22px;height:22px;accent-color:var(--orange-deep)}
+.install{display:flex;align-items:center;gap:12px}
+.install img{width:52px;height:52px;border-radius:12px;border:2.5px solid var(--ink-line);flex:none}
+.install p{margin:0;flex:1;font-size:14px}
+.install .btn{flex:none;min-height:40px;padding:6px 14px}
+.foot-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.foot-row button{border:2px solid currentColor;background:transparent;color:inherit;border-radius:999px;font-weight:900;font-size:13px;padding:4px 12px;cursor:pointer}
+.is-app footer{display:none}
+footer{border-top:3px solid var(--rule);background:var(--foot-bg);color:var(--foot-fg);font-weight:700;padding:18px 0;font-size:13px}
+.is-dark footer{border-top-color:var(--orange)}
+</style>
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="#">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2c-2 4-2 9 3 13M4 7c4 1 9 4 10 12M20 7c-4 0-9 2-12 10" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      混排球員數據
+    </a>
+    <div class="head-r">
+      <span class="who" id="who" hidden><span id="whoName"></span><button type="button" id="logoutBtn">登出</button></span>
+      <button type="button" class="theme-btn" id="themeBtn" role="switch" aria-checked="false" aria-label="深色模式" title="切換深淺色">
+        <span class="knob">
+          <svg class="i-sun" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>
+          <svg class="i-moon" width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+// 深淺色切換：記住選擇；沒選過就跟隨系統（與比分站同一套）
+(function(){
+  var root=document.documentElement, btn=document.getElementById("themeBtn");
+  var mq=window.matchMedia?window.matchMedia("(prefers-color-scheme: dark)"):null;
+  function saved(){ try{ return localStorage.getItem("mx-theme"); }catch(e){ return null; } }
+  function isDark(){ var t=root.getAttribute("data-theme"); return t? t==="dark" : !!(mq&&mq.matches); }
+  function sync(){ var d=isDark(); btn.setAttribute("aria-checked",d); root.classList.toggle("is-dark",d);
+    var m=document.querySelector('meta[name=theme-color]'); if(m) m.content=d?"#0E1529":"#EDA455"; }
+  var t=saved(); if(t==="dark"||t==="light") root.setAttribute("data-theme",t);
+  sync();
+  btn.addEventListener("click",function(){ var next=isDark()?"light":"dark"; root.setAttribute("data-theme",next); try{ localStorage.setItem("mx-theme",next); }catch(e){} sync(); });
+  if(mq&&mq.addEventListener) mq.addEventListener("change",sync);
+})();
+</script>
+
+<!-- ============ 登入 ============ -->
+<div id="viewLogin">
+  <div class="hero">
+    <div class="wrap">
+      <span class="edition" aria-hidden="true">STATS</span>
+      <h1>球員得失分紀錄</h1>
+      <p class="tagline">TAP · TALK · TRACK</p>
+    </div>
+  </div>
+  <main class="wrap">
+    <div class="login-grid">
+      <form class="login box" id="loginForm" autocomplete="off">
+        <h2>輸入隊伍代碼</h2>
+        <p class="note" style="margin-top:-6px">隊友建立隊伍後會給你一組 6 碼代碼。登入後只會看到、記錄自己隊的資料。</p>
+        <label class="field"><span>隊伍代碼</span>
+          <input class="code" id="codeInput" inputmode="numeric" maxlength="12" required aria-describedby="loginMsg">
+        </label>
+        <button class="btn" type="submit" id="loginBtn">登入</button>
+        <p class="msg" id="loginMsg" role="status"></p>
+      </form>
+      <form class="login box" id="createForm" autocomplete="off">
+        <h2>建立新隊伍</h2>
+        <p class="note" style="margin-top:-6px">第一次用？幫你的隊伍開一個帳號，系統會給你一組代碼分享給隊友。</p>
+        <label class="field"><span>隊名</span><input id="newTeamName" maxlength="20" required placeholder="例如：週一排球隊"></label>
+        <div class="field"><span>代表色</span><div class="swatches" id="newTeamColor" role="radiogroup" aria-label="代表色"></div></div>
+        <button class="btn" type="submit" id="createBtn">建立隊伍</button>
+        <p class="msg" id="createMsg" role="status"></p>
+      </form>
+    </div>
+    <div class="login-extra">
+      <div class="banner" id="demoBox" hidden>
+        <b>示範模式</b>（尚未設定後端網址，資料只存在這台裝置）。先建立一支隊伍試試；主辦代碼 <b>0000</b> 可以看全部隊伍。
+      </div>
+      <div class="banner install" id="installBox" hidden>
+        <img src="icons/icon-192.png" alt="">
+        <p id="installText"><b>裝成 App</b>：放在主畫面、全螢幕開啟，沒網路也打得開。</p>
+        <button class="btn" type="button" id="installBtn" hidden>安裝</button>
+      </div>
+      <div class="banner warn" id="lineWarn" hidden>你正在用 LINE 內建瀏覽器，語音輸入無法使用。請點右上角「⋯」→「用預設瀏覽器開啟」。</div>
+    </div>
+  </main>
+</div>
+
+<!-- ============ 主畫面 ============ -->
+<div id="viewApp" hidden>
+  <nav class="tabs">
+    <div class="wrap" role="tablist" aria-label="功能">
+      <button role="tab" id="t-rec" aria-controls="rec" aria-selected="true">紀錄</button>
+      <button role="tab" id="t-stats" aria-controls="stats" aria-selected="false" tabindex="-1">數據</button>
+      <button role="tab" id="t-team" aria-controls="team" aria-selected="false" tabindex="-1">隊伍</button>
+      <button type="button" class="sync" id="syncBtn" title="點一下立即同步">連線中…</button>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <!-- 紀錄 -->
+    <section class="panel" id="rec" role="tabpanel" aria-labelledby="t-rec">
+      <div class="box ctl">
+        <div class="ctl-row" id="teamRow" hidden><span class="lbl">隊伍</span><select class="inp" id="teamSel" aria-label="隊伍"></select></div>
+        <div class="ctl-row"><span class="lbl">場次</span><select class="inp" id="matchSel" aria-label="場次"></select>
+          <button class="btn ghost" type="button" id="newMatchBtn" aria-label="新增場次">＋新增</button></div>
+        <div class="ctl-row" style="flex-wrap:wrap"><span class="lbl">局數</span>
+          <div class="seg" id="setSeg" role="group" aria-label="局數"></div>
+          <span style="flex:1"></span>
+          <div class="seg small" id="modeSeg" role="group" aria-label="認人方式">
+            <button type="button" data-mode="name">名字</button><button type="button" data-mode="no">背號</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="noMatch" class="empty" style="margin-top:16px" hidden>先按「＋新增」建立一個場次，就可以開始記錄。</div>
+
+      <div id="recArea">
+        <button type="button" class="voice" id="voiceBtn" aria-describedby="heard">
+          <svg width="40" height="40" viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5M8.5 21.5h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          <span><span id="voiceLabel">按住說話</span><small id="voiceSub">例如「小明 殺球」，放開送出</small></span>
+        </button>
+        <p class="heard" id="heard" aria-live="polite"></p>
+        <div class="banner warn" id="noVoice" hidden></div>
+
+        <div class="sec-h"><h3>① 選隊員</h3><small id="pickHint">兩下點擊：隊員 → 動作</small></div>
+        <div class="pgrid" id="playerGrid"></div>
+        <div class="sec-h"><h3>② 選動作</h3><small>點完立即記一筆</small></div>
+        <div id="actionGrid"></div>
+
+        <div class="sec-h"><h3>最近紀錄</h3><small id="recentNote"></small></div>
+        <div class="box" style="padding:6px 12px"><ul class="recent" id="recent"></ul></div>
+      </div>
+    </section>
+
+    <!-- 數據 -->
+    <section class="panel" id="stats" role="tabpanel" aria-labelledby="t-stats" hidden>
+      <h2>球員數據</h2>
+      <div class="ctl-row" id="statsTeamRow" style="margin-bottom:10px" hidden><span class="lbl">隊伍</span><select class="inp" id="statsTeamSel" aria-label="隊伍"></select></div>
+      <div class="filters" id="statsFilter" role="group" aria-label="場次篩選"></div>
+      <div class="tiles">
+        <div class="stat-tile pt"><small>得分</small><b id="sumPt">0</b></div>
+        <div class="stat-tile er"><small>失誤</small><b id="sumEr">0</b></div>
+        <div class="stat-tile"><small>淨值</small><b id="sumNet">0</b></div>
+      </div>
+      <div class="tbl-scroll"><table class="stand" id="statsTable"></table></div>
+      <p class="note">淨值＝得分－失誤。點一列可看各動作次數。<span id="statsNote"></span></p>
+    </section>
+
+    <!-- 隊伍 -->
+    <section class="panel" id="team" role="tabpanel" aria-labelledby="t-team" hidden>
+      <h2>隊伍設定</h2>
+      <div class="ctl-row" id="mgrTeamRow" style="margin-bottom:14px" hidden><span class="lbl">隊伍</span><select class="inp" id="mgrTeamSel" aria-label="隊伍"></select></div>
+      <div class="empty" id="mgrEmpty" hidden>還沒有任何隊伍。</div>
+      <div id="mgrBody">
+        <div class="box" id="codeBox">
+          <div class="sec-h" style="margin-top:0"><h3>隊伍代碼</h3><small>傳給隊友，輸入就能一起記錄</small></div>
+          <div class="bigcode" id="teamCode">——</div>
+          <div class="row-btns">
+            <button class="btn" type="button" id="shareCode">分享</button>
+            <button class="btn ghost" type="button" id="copyCode">複製</button>
+            <button class="btn danger" type="button" id="regenCode">重設</button>
+          </div>
+          <p class="note">知道代碼的人都能記錄、修改這隊的資料。代碼外流時按「重設」，舊代碼和其他已登入的手機會立即失效。</p>
+        </div>
+
+        <form class="box" id="teamForm" style="margin-top:20px" autocomplete="off">
+          <div class="sec-h" style="margin-top:0"><h3>隊名與代表色</h3></div>
+          <label class="field"><span>隊名</span><input id="teamName" maxlength="20" required></label>
+          <div class="field"><span>代表色</span><div class="swatches" id="teamColor" role="radiogroup" aria-label="代表色"></div></div>
+          <button class="btn" type="submit" style="margin-top:16px;width:100%">儲存</button>
+          <p class="msg" id="teamMsg" role="status"></p>
+        </form>
+
+        <div class="sec-h"><h3>隊員</h3><small id="rosterCount"></small></div>
+        <form class="box" id="addPlayerForm" autocomplete="off">
+          <div class="add-grid">
+            <label class="field" style="margin-top:0"><span>姓名</span><input id="apName" maxlength="20" required placeholder="例如：黃柏穎"></label>
+            <label class="field" style="margin-top:0"><span>背號</span><input id="apNo" maxlength="4" inputmode="numeric" placeholder="選填"></label>
+          </div>
+          <label class="field"><span>綽號／常被聽錯的字（選填，用「、」分隔）</span><input id="apAlias" maxlength="60" placeholder="例如：阿穎、伯穎"></label>
+          <button class="btn" type="submit" id="apBtn" style="margin-top:16px;width:100%">＋ 新增隊員</button>
+          <p class="msg" id="apMsg" role="status"></p>
+        </form>
+        <div class="box" style="margin-top:16px;padding:6px 12px"><ul class="plist" id="plist"></ul></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="sheet" id="sheet" hidden></div>
+<div class="toast" id="toast" role="status" hidden><span id="toastText"></span><button type="button" id="toastUndo">撤銷</button></div>
+
+<dialog id="matchDlg">
+  <form method="dialog" id="matchForm">
+    <h3>新增場次</h3>
+    <p class="note" style="margin:0">對手名稱自由填寫，之後在數據頁可以單獨查看這一場。</p>
+    <label class="field"><span>日期</span><input type="date" id="mDate" required></label>
+    <label class="field"><span>對手</span><input id="mOpp" maxlength="40" placeholder="例如：東東隊" required></label>
+    <label class="field"><span>名稱（選填）</span><input id="mTitle" maxlength="40" placeholder="例如：第 1 場"></label>
+    <div class="acts"><button class="btn ghost" value="cancel" formnovalidate type="submit">取消</button><button class="btn" value="ok" type="submit">建立</button></div>
+  </form>
+</dialog>
+
+<dialog id="codeDlg">
+  <h3>隊伍建立好了！</h3>
+  <p class="note" id="codeDlgTeam" style="margin:0"></p>
+  <div class="bigcode" id="codeDlgCode"></div>
+  <p class="note">把這組代碼傳給隊友，他們在登入頁輸入就能一起記錄。之後也可以在「隊伍」分頁查看。</p>
+  <div class="acts"><button class="btn ghost" type="button" id="codeDlgShare">分享代碼</button><button class="btn" type="button" id="codeDlgGo">新增隊員</button></div>
+</dialog>
+
+<dialog id="playerDlg">
+  <form method="dialog" id="playerForm">
+    <h3>編輯隊員</h3>
+    <label class="field"><span>姓名</span><input id="epName" maxlength="20" required></label>
+    <label class="field"><span>背號（選填）</span><input id="epNo" maxlength="4" inputmode="numeric"></label>
+    <label class="field"><span>綽號／常被聽錯的字</span><input id="epAlias" maxlength="60"></label>
+    <label class="check"><input type="checkbox" id="epActive"> 在名單中（取消勾選＝停用，舊紀錄保留）</label>
+    <div class="acts"><button class="btn ghost" value="cancel" formnovalidate type="submit">取消</button><button class="btn" value="ok" type="submit">儲存</button></div>
+  </form>
+</dialog>
+
+<dialog id="authDlg">
+  <h3>需要重新登入</h3>
+  <p class="note">代碼可能被主辦更換或登入已過期。尚未送出的紀錄會保留在這台手機，重新登入後自動補送。</p>
+  <div class="acts"><button class="btn" type="button" id="reloginBtn">重新登入</button></div>
+</dialog>
+
+<footer><div class="wrap foot-row"><span>© 2026 你混哪？我混排！・球員得失分紀錄</span><button type="button" id="footInstall" hidden>📲 安裝成 App</button></div></footer>
+
+<script>
+(function(){
+"use strict";
+
+/* ====================== 設定 ====================== */
+// 部署好 Apps Script 後，把網址貼在這裡。留空＝示範模式（資料只存在這台裝置）。
+const API_URL = "";
+const SYNC_EVERY_MS = 8000;        // 有待送資料時多久重試一次
+const STATS_REFRESH_MS = 30000;    // 數據頁多久重新讀取伺服器
+const BOOT_REFRESH_MS = 120000;    // 名單、動作多久重新讀取
+const CONFIRM_MS = 3000;           // 語音確認卡片倒數
+
+const DEMO = !API_URL || /[?&]demo=1/.test(location.search);
+
+/* ====================== 小工具 ====================== */
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : (Date.now().toString(36)+Math.random().toString(36).slice(2,10))).replace(/-/g,"").slice(0,20);
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const today = () => { const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); };
+const hhmm = t => new Date(t).toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
+
+let device = store.get("vs-device");
+if(!device){ device = "d"+uid(); store.set("vs-device",device); }
+
+/* ====================== 後端呼叫 ====================== */
+async function realApi(payload){
+  const ctl = new AbortController(); const t=setTimeout(()=>ctl.abort(),15000);
+  try{
+    const r = await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload),redirect:"follow",signal:ctl.signal,credentials:"omit",cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+
+// 隊伍代表色（與 Code.gs 的 PALETTE 相同）
+const PALETTE = [["#3FA0D8","晴空藍"],["#F2B630","向日葵黃"],["#A8487F","莓果紫紅"],["#86A83C","亮酪梨綠"],["#D9573B","番茄紅"],["#E08A3A","南瓜橘"],["#3BA99C","薄荷綠"],["#2F4A8A","午夜藍"]];
+function fgFor(hex){ const m=/^#?([0-9a-f]{6})$/i.exec(hex||""); if(!m) return "#22170F"; const n=parseInt(m[1],16);
+  return (0.299*((n>>16)&255)+0.587*((n>>8)&255)+0.114*(n&255))/255>0.5 ? "#22170F" : "#FFF6E6"; }
+
+// 示範模式：在瀏覽器裡模擬 Code.gs 的行為（同樣的權限規則）
+const demoApi = (function(){
+  const ACTIONS=[["KILL","殺球","得分","殺球、扣殺、扣球、攻擊得分、殺"],["BLOCK","攔網","得分","攔網得分、攔網、攔"],["ACE","發球","得分","發球得分、發球、愛司、ACE"],["TIP","吊球","得分","吊球、輕吊、吊"],
+    ["SERR","發球失誤","失誤","發球失誤、發球掛網、發球出界、發球失分"],["AERR","攻擊失誤","失誤","攻擊失誤、殺球失誤、扣球失誤、打出界、攻擊出界"],["NET","觸網","失誤","觸網、碰網、摸網"],
+    ["RERR","接發失誤","失誤","接發失誤、接發球失誤、接球失誤、一傳失誤"],["FAULT","違例","失誤","違例、犯規、持球、連擊、過中線、踩線"]].map((a,i)=>({code:a[0],name:a[1],cat:a[2],value:1,keys:a[3].split("、"),order:i+1}));
+  const seed = () => ({teams:[],players:[],codes:{},matches:[],events:[],fails:{},made:{}});
+  let db = store.get("vs-demo-db2") || seed();
+  const save = () => store.set("vs-demo-db2",db);
+  const clean = (v,n) => String(v==null?"":v).replace(/[\u0000-\u001f<>]/g,"").trim().slice(0,n);
+  const newCode = () => { let c; do{ c=String(100000+Math.floor(Math.random()*900000)); }while(db.codes[c]||c==="000000"); return c; };
+  const auth = tok => { const m=/^demo\.(\w+)\.(\d+)$/.exec(tok||""); if(!m) throw {code:"auth"}; const s=m[1];
+    if(s!=="ADMIN" && db.codes[m[2]]!==s) throw {code:"auth"};
+    return {scope:s,admin:s==="ADMIN",canSee:t=>s==="ADMIN"||t===s}; };
+  const tok = (s,c) => "demo."+s+"."+c;
+  return async function(p){
+    await new Promise(r=>setTimeout(r,120));
+    if(store.get("vs-demo-offline")) throw new Error("offline");
+    try{
+      if(p.action==="login"){
+        const f=db.fails[p.device]||{n:0,until:0};
+        if(f.until>Date.now()) return {ok:false,error:"locked",retryAfter:Math.ceil((f.until-Date.now())/1000)};
+        const c=String(p.code||"").trim(), s=c==="0000"?"ADMIN":db.codes[c];
+        if(!s){ f.n++; if(f.n>=5){ f.until=Date.now()+600000; f.n=0; } db.fails[p.device]=f; save(); return {ok:false,error:"bad_code",left:Math.max(0,5-f.n)}; }
+        delete db.fails[p.device]; save(); return {ok:true,token:tok(s,c==="0000"?"0":c),scope:s};
+      }
+      if(p.action==="createTeam"){
+        const name=clean(p.name,20); if(!name) return {ok:false,error:"bad_name"};
+        const m=db.made[p.device]||[]; const recent=m.filter(t=>Date.now()-t<3600000); if(recent.length>=5) return {ok:false,error:"too_many"};
+        let key; do{ key="T"+Math.random().toString(36).slice(2,7).toUpperCase(); }while(db.teams.some(t=>t.key===key));
+        const color=/^#[0-9a-f]{6}$/i.test(p.color||"")?p.color.toUpperCase():PALETTE[0][0], code=newCode();
+        db.teams.push({key,name,color,fg:fgFor(color)}); db.codes[code]=key; recent.push(Date.now()); db.made[p.device]=recent; save();
+        return {ok:true,key,code,scope:key,token:tok(key,code)};
+      }
+      const a=auth(p.token);
+      const codeOf = k => Object.keys(db.codes).find(c=>db.codes[c]===k)||"";
+      if(p.action==="bootstrap") return {ok:true,scope:a.scope,admin:a.admin,serverTime:Date.now(),teams:db.teams.filter(t=>a.canSee(t.key)),players:db.players.filter(x=>a.canSee(x.team)),actions:ACTIONS,matches:db.matches.filter(m=>a.canSee(m.team)),code:a.admin?"":codeOf(a.scope)};
+      if(p.action==="events") return {ok:true,serverTime:Date.now(),events:db.events.filter(e=>e.status==="有效"&&a.canSee(e.team)).map(e=>({id:e.id,match:e.match,set:e.set,team:e.team,player:e.player,action:e.action,cat:e.cat,value:e.value}))};
+      if(p.action==="team"){
+        const team=a.admin?String(p.team||""):a.scope, t=db.teams.find(x=>x.key===team);
+        if(!t||!a.canSee(team)) return {ok:false,error:"forbidden"};
+        const out={ok:true,team};
+        if(p.op==="rename"){ const n=clean(p.name,20); if(!n) return {ok:false,error:"bad_name"}; t.name=n; if(/^#[0-9a-f]{6}$/i.test(p.color||"")){ t.color=p.color.toUpperCase(); t.fg=fgFor(t.color); } }
+        else if(p.op==="regenCode"){ delete db.codes[codeOf(team)]; const c=newCode(); db.codes[c]=team; out.code=c; if(!a.admin) out.token=tok(team,c); }
+        else if(p.op==="addPlayer"){ const n=clean(p.name,20); if(!n) return {ok:false,error:"bad_name"};
+          const mine=db.players.filter(x=>x.team===team); let i=mine.length+1,id; do{ id=team+String(i).padStart(2,"0"); i++; }while(mine.some(x=>x.id===id));
+          db.players.push({id,team,name:n,alias:clean(p.alias,60).split(/[、,，;；\/\s]+/).filter(Boolean),no:clean(p.no,4),gender:"",active:true}); out.id=id; }
+        else if(p.op==="updatePlayer"){ const x=db.players.find(y=>y.id===p.id&&y.team===team); if(!x) return {ok:false,error:"not_found"};
+          if(p.name!==undefined){ const n=clean(p.name,20); if(!n) return {ok:false,error:"bad_name"}; x.name=n; }
+          if(p.no!==undefined) x.no=clean(p.no,4); if(p.alias!==undefined) x.alias=clean(p.alias,60).split(/[、,，;；\/\s]+/).filter(Boolean); if(p.active!==undefined) x.active=!!p.active; }
+        else return {ok:false,error:"unknown_op"};
+        save(); out.teams=[t]; out.players=db.players.filter(x=>x.team===team); return out;
+      }
+      if(p.action==="sync"){
+        const done=[],rejected=[];
+        (p.ops||[]).forEach(op=>{
+          const rej=r=>rejected.push({key:op.key,reason:r});
+          if(op.op==="match"){ const team=a.admin?op.m.team:a.scope; if(!a.canSee(team)) return rej("forbidden");
+            if(!db.matches.some(m=>m.id===op.m.id)) db.matches.push({id:op.m.id,team,date:op.m.date,opponent:op.m.opponent,title:op.m.title,created:Date.now()}); done.push(op.key); }
+          else if(op.op==="add"){ const e=op.ev; if(db.events.some(x=>x.id===e.id)) return done.push(op.key);
+            const team=a.admin?e.team:a.scope; if(!a.canSee(team)) return rej("forbidden");
+            const m=db.matches.find(x=>x.id===e.match); if(!m||m.team!==team) return rej("bad_match");
+            const pl=db.players.find(x=>x.id===e.player); if(!pl||pl.team!==team) return rej("bad_player");
+            const ac=ACTIONS.find(x=>x.code===e.action); if(!ac) return rej("bad_action");
+            db.events.push({id:e.id,match:m.id,set:e.set,team,player:pl.id,action:ac.code,cat:ac.cat,value:ac.value,status:"有效"}); done.push(op.key); }
+          else if(op.op==="undo"){ const e=db.events.find(x=>x.id===op.id); if(!e) return rej("not_found"); if(!a.canSee(e.team)) return rej("forbidden"); e.status="已撤銷"; done.push(op.key); }
+        });
+        save(); return {ok:true,done,rejected};
+      }
+      return {ok:false,error:"unknown_action"};
+    }catch(e){ return {ok:false,error:e.code||"server"}; }
+  };
+})();
+const api = DEMO ? demoApi : realApi;
+
+/* ====================== 狀態 ====================== */
+let auth = store.get("vs-auth");                 // {token, scope}
+let boot = null;                                 // 名單、動作、場次（有快取，離線也能開）
+let local = null;                                // 這台手機的紀錄：{events:{id:ev}, matches:{id:m}}
+let queue = [];                                  // 待送佇列
+let serverEvents = [];                           // 伺服器上的有效紀錄（數據頁用）
+let prefs = Object.assign({mode:"name",set:1,match:"",team:""}, store.get("vs-prefs",{}));
+let sel = {player:null, action:null};
+let syncState = {busy:false, lastOk:0, offline:false, needAuth:false};
+let lastBoot = 0, lastStats = 0;
+
+const K = s => "vs-"+s+"-"+(auth?auth.scope:"x");
+function loadLocal(){
+  boot = store.get(K("boot"),null);
+  local = store.get(K("local"),{events:{},matches:{}});
+  queue = store.get(K("queue"),[]);
+  serverEvents = store.get(K("server"),[]);
+}
+const saveLocal = () => { store.set(K("local"),local); store.set(K("queue"),queue); };
+const savePrefs = () => store.set("vs-prefs",prefs);
+
+const teams = () => (boot && boot.teams) || [];
+const isAdmin = () => !!(auth && auth.scope==="ADMIN");
+const curTeam = () => isAdmin() ? (teams().some(t=>t.key===prefs.team) ? prefs.team : (teams()[0]||{}).key) : auth.scope;
+const teamOf = k => teams().find(t=>t.key===k) || {key:k,name:k,color:"#8C7B68",fg:"#FFF6E6"};
+const allPlayersOf = k => ((boot && boot.players)||[]).filter(p=>p.team===k);
+const playersOf = k => allPlayersOf(k).filter(p=>p.active!==false);      // 記錄、語音只用在名單中的隊員
+const actions = () => (boot && boot.actions) || [];
+const actionBy = c => actions().find(a=>a.code===c);
+const playerBy = id => ((boot && boot.players)||[]).find(p=>p.id===id);
+function matchesOf(k){
+  const map={};
+  ((boot && boot.matches)||[]).forEach(m=>map[m.id]=m);
+  Object.values(local.matches).forEach(m=>{ if(!map[m.id]) map[m.id]=m; });
+  return Object.values(map).filter(m=>m.team===k).sort((a,b)=>(b.date||"").localeCompare(a.date||"") || (b.created||0)-(a.created||0));
+}
+const matchLabel = m => [m.date?m.date.slice(5).replace("-","/"):"", m.title, m.opponent?"vs "+m.opponent:""].filter(Boolean).join(" ");
+
+/* ====================== 登入 ====================== */
+const ERR = {bad_code:"代碼不對", locked:"錯太多次，暫停中", auth:"登入已失效"};
+$("loginForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const code=$("codeInput").value.trim(); if(!code) return;
+  const msg=$("loginMsg"); msg.className="msg"; msg.textContent="確認中…"; $("loginBtn").disabled=true;
+  try{
+    const r = await api({action:"login",code,device});
+    if(!r.ok){
+      msg.className="msg err";
+      if(r.error==="locked") msg.textContent=`錯太多次，請 ${Math.ceil(r.retryAfter/60)} 分鐘後再試。`;
+      else if(r.error==="bad_code") msg.textContent= r.left>0 ? `代碼不對，再錯 ${r.left} 次會暫停 10 分鐘。` : "代碼不對，已暫停 10 分鐘。";
+      else msg.textContent="登入失敗："+(r.message||r.error);
+      return;
+    }
+    auth={token:r.token,scope:r.scope}; store.set("vs-auth",auth);
+    msg.textContent=""; $("codeInput").value="";
+    await enterApp(true);
+  }catch(err){ msg.className="msg err"; msg.textContent="連不上伺服器，請確認網路後再試。"; }
+  finally{ $("loginBtn").disabled=false; }
+});
+$("logoutBtn").addEventListener("click",()=>{
+  if(queue.length && !confirm(`還有 ${queue.length} 筆沒送出，登出後會等你下次用同一隊登入時再補送。確定登出？`)) return;
+  auth=null; store.del("vs-auth"); showLogin();
+});
+$("reloginBtn").addEventListener("click",()=>{ $("authDlg").close(); const s=auth&&auth.scope; auth=null; store.del("vs-auth"); showLogin(); if(s) $("loginMsg").textContent="請重新輸入代碼。"; });
+
+function showLogin(){
+  $("viewLogin").hidden=false; $("viewApp").hidden=true; $("who").hidden=true; closeCard();
+  if(DEMO) $("demoBox").hidden=false;
+  renderSwatches($("newTeamColor"), $("newTeamColor").dataset.value || PALETTE[Math.floor(Math.random()*PALETTE.length)][0]);
+  if(/\bLine\//i.test(navigator.userAgent)) $("lineWarn").hidden=false;
+}
+/* ====================== 建立隊伍 ====================== */
+function renderSwatches(el, value){
+  el.dataset.value=value;
+  el.innerHTML=PALETTE.map(([c,n])=>`<button type="button" class="sw" role="radio" style="--c:${c};--f:${fgFor(c)}" data-c="${c}" aria-checked="${c.toUpperCase()===String(value).toUpperCase()}" aria-label="${n}" title="${n}"></button>`).join("");
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest(".sw"); if(!b) return;
+  const g=b.parentNode; g.dataset.value=b.dataset.c;
+  g.querySelectorAll(".sw").forEach(x=>x.setAttribute("aria-checked",x===b));
+});
+const shareUrl = () => location.origin + location.pathname;
+async function shareCode(name, code){
+  const text=`「${name}」的隊伍代碼：${code}\n打開 ${shareUrl()} 輸入代碼，就能一起記錄球員得失分。`;
+  if(navigator.share){ try{ await navigator.share({title:"隊伍代碼",text}); return; }catch(e){ if(e&&e.name==="AbortError") return; } }
+  copyText(text);
+}
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); showToast("已複製"); }
+  catch(e){ showToast("無法自動複製，請長按代碼手動複製"); }
+}
+$("createForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const name=$("newTeamName").value.trim(); if(!name) return;
+  const color=$("newTeamColor").dataset.value;
+  const msg=$("createMsg"); msg.className="msg"; msg.textContent="建立中…"; $("createBtn").disabled=true;
+  try{
+    const r=await api({action:"createTeam",name,color,device});
+    if(!r.ok){ msg.className="msg err"; msg.textContent = r.error==="too_many" ? "這台裝置一小時內建立太多隊伍了，請稍後再試。" : r.error==="bad_name" ? "請輸入隊名。" : "建立失敗："+(r.message||r.error); return; }
+    auth={token:r.token,scope:r.scope}; store.set("vs-auth",auth);
+    msg.textContent=""; $("newTeamName").value="";
+    $("codeDlgTeam").textContent="隊名："+name; $("codeDlgCode").textContent=r.code;
+    $("codeDlg").dataset.name=name; $("codeDlg").dataset.code=r.code;
+    await enterApp(true);
+    $("codeDlg").showModal();
+  }catch(err){ msg.className="msg err"; msg.textContent="連不上伺服器，請確認網路後再試。"; }
+  finally{ $("createBtn").disabled=false; }
+});
+$("codeDlgShare").addEventListener("click",()=>shareCode($("codeDlg").dataset.name,$("codeDlg").dataset.code));
+$("codeDlgGo").addEventListener("click",()=>{ $("codeDlg").close(); show("team"); setTimeout(()=>$("apName").focus(),100); });
+
+async function enterApp(fresh){
+  loadLocal(); syncState.needAuth=false;
+  $("viewLogin").hidden=true; $("viewApp").hidden=false; $("who").hidden=false;
+  renderAll();
+  await refreshBoot(fresh);
+  flush();
+}
+
+async function refreshBoot(){
+  try{
+    const r = await api({action:"bootstrap",token:auth.token});
+    if(!r.ok){ if(r.error==="auth") return needAuth(); throw new Error(r.error); }
+    boot=r; store.set(K("boot"),boot); lastBoot=Date.now();
+    // 伺服器已有的場次就不必再留本機副本
+    (boot.matches||[]).forEach(m=>{ if(local.matches[m.id] && !queue.some(q=>q.op==="match"&&q.m.id===m.id)) delete local.matches[m.id]; });
+    saveLocal(); renderAll();
+  }catch(e){ setOffline(true); if(!boot) $("heard").textContent="離線中，且這台手機還沒有名單快取，請連上網路。"; }
+}
+function needAuth(){ syncState.needAuth=true; renderSync(); if(!$("authDlg").open) $("authDlg").showModal(); }
+
+/* ====================== 新增紀錄／撤銷／同步 ====================== */
+function addEvent(playerId, actionCode, source, transcript){
+  const p=playerBy(playerId), a=actionBy(actionCode), m=prefs.match;
+  if(!p||!a||!m) return null;
+  const ev={id:uid(),deviceTime:new Date().toISOString(),t:Date.now(),match:m,set:prefs.set,team:p.team,player:p.id,action:a.code,cat:a.cat,value:a.value,source,transcript:transcript||"",st:"pending"};
+  local.events[ev.id]=ev;
+  queue.push({op:"add",key:"a:"+ev.id,ev:{id:ev.id,deviceTime:ev.deviceTime,match:ev.match,set:ev.set,team:ev.team,player:ev.player,action:ev.action,source,transcript:ev.transcript}});
+  saveLocal(); renderRecent(); renderStats(); flush();
+  if(navigator.vibrate) navigator.vibrate(30);
+  showToast(`已記：${p.name} ${a.name} ${a.cat==="失誤"?"−":"+"}${a.value}`, ev.id);
+  return ev;
+}
+function undoEvent(id){
+  const ev=local.events[id]; if(!ev||ev.st==="undone") return;
+  const i=queue.findIndex(q=>q.op==="add"&&q.ev.id===id);
+  if(i>=0) queue.splice(i,1);                       // 還沒送出：直接從佇列拿掉
+  else queue.push({op:"undo",key:"u:"+id,id});      // 已送出：送撤銷
+  ev.st="undone"; ev.undoneAt=Date.now();
+  serverEvents=serverEvents.filter(e=>e.id!==id);
+  saveLocal(); renderRecent(); renderStats(); flush();
+  showToast("已撤銷："+((playerBy(ev.player)||{}).name||"")+" "+((actionBy(ev.action)||{}).name||""));
+}
+
+async function flush(){
+  if(!auth || syncState.busy || syncState.needAuth) return renderSync();
+  if(!queue.length){ renderSync(); return; }
+  syncState.busy=true; renderSync();
+  const batch=queue.slice(0,100);
+  try{
+    const r=await api({action:"sync",token:auth.token,device,ops:batch});
+    if(!r.ok){ if(r.error==="auth") needAuth(); else throw new Error(r.error); return; }
+    const finished=new Set(r.done.concat(r.rejected.map(x=>x.key)));
+    const rej={}; r.rejected.forEach(x=>rej[x.key]=x.reason);
+    batch.forEach(op=>{
+      if(!finished.has(op.key)) return;
+      if(op.op==="add"){ const ev=local.events[op.ev.id]; if(ev&&ev.st==="pending") ev.st=rej[op.key]?"rejected":"synced"; if(ev&&rej[op.key]) ev.why=rej[op.key]; }
+    });
+    queue=queue.filter(op=>!finished.has(op.key));
+    syncState.lastOk=Date.now(); setOffline(false); saveLocal();
+    renderRecent();
+    if(queue.length) setTimeout(flush,50);
+  }catch(e){ setOffline(true); }
+  finally{ syncState.busy=false; renderSync(); }
+}
+function setOffline(v){ syncState.offline=v; renderSync(); }
+function renderSync(){
+  const b=$("syncBtn"); if(!b) return;
+  const n=queue.length;
+  if(syncState.needAuth){ b.className="sync off"; b.textContent="需重新登入"+(n?`・待送 ${n}`:""); }
+  else if(syncState.offline||!navigator.onLine){ b.className="sync off"; b.textContent=n?`離線・待補送 ${n} 筆`:"離線中"; }
+  else if(n){ b.className="sync wait"; b.textContent=syncState.busy?`同步中…（${n}）`:`待送 ${n} 筆`; }
+  else { b.className="sync ok"; b.textContent=DEMO?"已存（示範）":"已同步"; }
+}
+$("syncBtn").addEventListener("click",()=>{ syncState.offline=false; flush(); if(currentTab==="stats") refreshStats(); });
+window.addEventListener("online",()=>{ syncState.offline=false; flush(); });
+window.addEventListener("offline",()=>setOffline(true));
+setInterval(()=>{ if(!auth||document.hidden) return; if(queue.length) flush(); if(Date.now()-lastBoot>BOOT_REFRESH_MS) refreshBoot(); if(currentTab==="stats"&&Date.now()-lastStats>STATS_REFRESH_MS) refreshStats(); }, SYNC_EVERY_MS);
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden&&auth){ flush(); if(currentTab==="stats") refreshStats(); } });
+
+/* ====================== 場次 ====================== */
+$("newMatchBtn").addEventListener("click",()=>{ $("mDate").value=today(); $("mOpp").value=""; $("mTitle").value=""; $("matchDlg").showModal(); setTimeout(()=>$("mOpp").focus(),50); });
+$("matchDlg").addEventListener("close",()=>{
+  if($("matchDlg").returnValue!=="ok") return;
+  const m={id:"M"+uid().slice(0,10),team:curTeam(),date:$("mDate").value||today(),opponent:$("mOpp").value.trim(),title:$("mTitle").value.trim(),created:Date.now()};
+  local.matches[m.id]=m; queue.push({op:"match",key:"m:"+m.id,m:{id:m.id,team:m.team,date:m.date,opponent:m.opponent,title:m.title}});
+  prefs.match=m.id; prefs.set=1; savePrefs(); saveLocal(); renderAll(); flush();
+});
+$("matchSel").addEventListener("change",e=>{ prefs.match=e.target.value; prefs.set=1; savePrefs(); clearSel(); renderAll(); });
+$("teamSel").addEventListener("change",e=>{ prefs.team=e.target.value; prefs.match=""; savePrefs(); clearSel(); renderAll(); });
+$("modeSeg").addEventListener("click",e=>{ const b=e.target.closest("[data-mode]"); if(!b) return; prefs.mode=b.dataset.mode; savePrefs(); renderControls(); renderPlayers(); });
+
+/* ====================== 畫面：紀錄 ====================== */
+function renderAll(){
+  if(!auth) return;
+  const t=isAdmin()?{name:"主辦（全部隊伍）"}:teamOf(auth.scope);
+  $("whoName").textContent=(DEMO?"示範・":"")+t.name;
+  renderControls(); renderPlayers(); renderActions(); renderRecent(); renderSync();
+  if(currentTab==="stats") renderStats();
+  if(currentTab==="team") renderTeam();
+}
+function renderControls(){
+  const k=curTeam();
+  $("teamRow").hidden=!isAdmin();
+  if(isAdmin()) $("teamSel").innerHTML=teams().map(t=>`<option value="${t.key}" ${t.key===k?"selected":""}>${esc(t.key+"｜"+t.name)}</option>`).join("");
+  const ms=matchesOf(k);
+  if(!ms.some(m=>m.id===prefs.match)) prefs.match=ms[0]?ms[0].id:"";
+  $("matchSel").innerHTML = ms.length ? ms.map(m=>`<option value="${esc(m.id)}" ${m.id===prefs.match?"selected":""}>${esc(matchLabel(m)||"未命名場次")}</option>`).join("") : `<option value="">（尚無場次）</option>`;
+  $("matchSel").disabled=!ms.length;
+  $("setSeg").innerHTML=[1,2,3].map(n=>`<button type="button" data-set="${n}" aria-pressed="${prefs.set===n}" aria-label="第 ${n} 局">${n}</button>`).join("");
+  document.querySelectorAll("#modeSeg [data-mode]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===prefs.mode));
+  $("noMatch").hidden=!!prefs.match; $("recArea").hidden=!prefs.match;
+  $("voiceSub").textContent = prefs.mode==="no" ? "例如「8 號 殺球」，放開送出" : "例如「小明 殺球」，放開送出";
+}
+$("setSeg").addEventListener("click",e=>{ const b=e.target.closest("[data-set]"); if(!b) return; prefs.set=+b.dataset.set; savePrefs(); renderControls(); renderRecent(); });
+
+function playerBtn(p, extra){
+  const t=teamOf(p.team), byNo=prefs.mode==="no"&&p.no;
+  const inner = byNo ? `<span class="no">${esc(p.no)}</span><small>${esc(p.name)}</small>` : `${esc(p.name)}${p.no?`<small>#${esc(p.no)}</small>`:""}`;
+  return `<button type="button" class="pbtn" style="--tc:${t.color};--tf:${t.fg}" data-player="${esc(p.id)}" ${extra||""}>${inner}</button>`;
+}
+function renderPlayers(){
+  let ps=playersOf(curTeam());
+  if(prefs.mode==="no") ps=ps.slice().sort((a,b)=>(parseInt(a.no)||999)-(parseInt(b.no)||999));
+  $("playerGrid").innerHTML = ps.length ? ps.map(p=>playerBtn(p,`aria-pressed="${sel.player===p.id}"`)).join("")
+    : !boot ? `<div class="empty" style="grid-column:1/-1">名單載入中…</div>`
+    : !curTeam() ? `<div class="empty" style="grid-column:1/-1">還沒有任何隊伍</div>`
+    : `<div class="empty" style="grid-column:1/-1">這隊還沒有隊員<br><button class="btn" type="button" data-goto="team" style="margin-top:12px">去新增隊員</button></div>`;
+}
+function actionBtn(a, extra){ return `<button type="button" class="abtn ${a.cat==="失誤"?"er":"pt"}" data-action="${esc(a.code)}" ${extra||""}>${esc(a.name)}</button>`; }
+function renderActions(){
+  const grp=(cat,c)=>{ const list=actions().filter(a=>a.cat===cat); return list.length?`<div class="agrp" style="--c:${c}">${cat}</div><div class="agrid">${list.map(a=>actionBtn(a,`aria-pressed="${sel.action===a.code}"`)).join("")}</div>`:""; };
+  $("actionGrid").innerHTML=grp("得分","var(--orange)")+grp("失誤","var(--err-bg)");
+}
+function clearSel(){ sel={player:null,action:null}; }
+$("playerGrid").addEventListener("click",e=>{ if(e.target.closest("[data-goto]")) return show("team"); const b=e.target.closest("[data-player]"); if(!b) return; tap("player",b.dataset.player); });
+$("actionGrid").addEventListener("click",e=>{ const b=e.target.closest("[data-action]"); if(!b) return; tap("action",b.dataset.action); });
+function tap(kind,val){
+  sel[kind] = sel[kind]===val ? null : val;
+  if(sel.player && sel.action){ addEvent(sel.player, sel.action, "tap"); clearSel(); }
+  renderPlayers(); renderActions();
+  $("pickHint").textContent = sel.player ? "再點一個動作" : sel.action ? "再點一位隊員" : "兩下點擊：隊員 → 動作";
+}
+
+function renderRecent(){
+  const list=Object.values(local.events).filter(e=>e.match===prefs.match).sort((a,b)=>b.t-a.t).slice(0,10);
+  $("recentNote").textContent = list.length ? "只顯示這台手機記的" : "";
+  $("recent").innerHTML = list.length ? list.map(e=>{
+    const p=playerBy(e.player)||{name:"?"}, a=actionBy(e.action)||{name:e.action,cat:e.cat}, t=teamOf(e.team);
+    const st = e.st==="pending" ? `<span class="chip">⏳ 待送</span>` : e.st==="rejected" ? `<span class="chip tag-err" title="${esc(e.why||"")}">未收</span>` : "";
+    return `<li class="${e.st==="undone"?"undone":""}"><i class="dot" style="background:${t.color}"></i>
+      <span class="txt">${esc(p.name)} ${esc(a.name)}<small>第 ${e.set} 局・${hhmm(e.t)}・${e.source==="voice"?"語音":"點按"}</small></span>
+      ${st}<span class="val ${e.cat==="失誤"?"er":"pt"}">${e.cat==="失誤"?"−":"+"}${e.value}</span>
+      ${e.st==="undone"?`<small style="color:var(--muted)">已撤銷</small>`:`<button type="button" data-undo="${esc(e.id)}">撤銷</button>`}</li>`;
+  }).join("") : `<li style="justify-content:center;color:var(--muted)">這一場還沒有紀錄</li>`;
+}
+$("recent").addEventListener("click",e=>{ const b=e.target.closest("[data-undo]"); if(b) undoEvent(b.dataset.undo); });
+
+let toastTimer=null, toastId=null;
+function showToast(text,id){
+  toastId=id||null; $("toastText").textContent=text; $("toastUndo").hidden=!id;
+  $("toast").hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>$("toast").hidden=true,3500);
+}
+$("toastUndo").addEventListener("click",()=>{ if(toastId) undoEvent(toastId); $("toast").hidden=true; });
+
+/* ====================== 語音解析（可在 node 單獨測試） ====================== */
+const VS = window.VSMatch = (function(){
+  const CN={"零":0,"〇":0,"一":1,"二":2,"兩":2,"两":2,"三":3,"四":4,"五":5,"六":6,"七":7,"八":8,"九":9};
+  function cnNum(s){ // 中文數字（到 99）轉阿拉伯數字
+    return s.replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-65248))
+      .replace(/([零〇一二兩两三四五六七八九]?)十([一二三四五六七八九]?)/g,(m,a,b)=>String((a?CN[a]:1)*10+(b?CN[b]:0)))
+      .replace(/[零〇一二兩两三四五六七八九](?=\s*號|\s*号)/g,c=>String(CN[c]));
+  }
+  const norm = s => cnNum(String(s||"")).toLowerCase().replace(/[\s，。、！？!?,.~～…「」"'：:；;（）()]/g,"");
+  let py = null;
+  function pyOf(ch){
+    if(/[a-z0-9]/.test(ch)) return ch;
+    if(!py && window.pinyinPro && window.pinyinPro.pinyin) py=window.pinyinPro.pinyin;
+    if(!py) return ch;
+    try{ const r=py(ch,{toneType:"none",type:"array"})[0]; return /^[a-zü]+$/.test(r||"") ? r.replace("ü","v") : ch; }catch(e){ return ch; }
+  }
+  const cache=new Map();
+  const toks = s => { if(cache.has(s)) return cache.get(s); const r=[...s].map(pyOf); cache.set(s,r); return r; };
+  function fz(sy){ // 台灣口音常混淆的音合併
+    return sy.replace(/^zh/,"z").replace(/^ch/,"c").replace(/^sh/,"s").replace(/^l(?=[aeiou])/,"n").replace(/^f/,"h")
+      .replace(/ing$/,"in").replace(/eng$/,"en").replace(/ang$/,"an").replace(/uan$/,"an").replace(/^r/,"l");
+  }
+  function split(sy){ const m=/^(zh|ch|sh|[bpmfdtnlgkhjqxrzcsyw])?(.*)$/.exec(sy); return [m[1]||"",m[2]]; }
+  function sim(a,b){
+    if(a===b) return 1;
+    if(!/^[a-zv]+$/.test(a)||!/^[a-zv]+$/.test(b)) return 0;   // 沒有拼音（字典沒載入）就只能逐字比
+    if(fz(a)===fz(b)) return .85;
+    const [ia,fa]=split(fz(a)), [ib,fb]=split(fz(b));
+    if(fa===fb) return .55;
+    if(ia===ib && ia) return .35;
+    return 0;
+  }
+  function lev(A,B){ // 加權編輯距離（以音節為單位）
+    const d=Array.from({length:A.length+1},(_,i)=>[i]);
+    for(let j=1;j<=B.length;j++) d[0][j]=j;
+    for(let i=1;i<=A.length;i++) for(let j=1;j<=B.length;j++)
+      d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(1-sim(A[i-1],B[j-1])));
+    return d[A.length][B.length];
+  }
+  // cand 在 text 裡最像的一段：回傳 {score,start,end}
+  function best(cand,text){
+    if(!cand||!text) return {score:0,start:0,end:0};
+    const i=text.indexOf(cand); if(i>=0) return {score:1,start:i,end:i+cand.length};
+    const A=toks(cand), B=toks(text); let r={score:0,start:0,end:0};
+    for(let len=Math.max(1,A.length-1);len<=A.length+1;len++)
+      for(let s=0;s+len<=B.length;s++){
+        const sc=1-lev(A,B.slice(s,s+len))/Math.max(A.length,len);
+        if(sc>r.score+1e-9) r={score:sc,start:s,end:s+len};
+      }
+    return r;
+  }
+  function namesOf(p){
+    const n=norm(p.name), out=[n];
+    if(/^[一-鿿]{3}$/.test(n)) out.push(n.slice(1));          // 三字名：也認「柏穎」
+    if(/^[一-鿿]{4}$/.test(n)) out.push(n.slice(2));
+    (p.alias||[]).forEach(a=>{ const x=norm(a); if(x) out.push(x); });
+    return out;
+  }
+  const isCancel = t => /^(取消|撤銷|撤消|不對|刪掉|刪除|錯了|收回|不是)/.test(t) || /^(取消|撤銷)/.test(t.replace(/^(剛剛|剛才|上一筆|上一個)/,""));
+  const FILL=/(這球|那球|一球|一顆|好球|漂亮|的|了|啦|喔|哦|耶|欸|呃|嗯|號碼|號|号)/g;
+
+  function findAction(t,acts){
+    let r=null;
+    acts.forEach(a=>{ [a.name].concat(a.keys||[]).forEach(k=>{
+      const kk=norm(k); if(!kk) return;
+      const b=best(kk,t); const need = kk.length<=1 ? 1 : .8;           // 單字關鍵字（例如「殺」）只接受完全相同
+      if(b.score>=need){ const w=b.score*10+kk.length; if(!r||w>r.w) r={a,w,score:b.score,start:b.start,end:b.end}; }
+    }); });
+    return r;
+  }
+  function rankPlayers(part,players,mode){
+    const num=(part.match(/\d{1,3}/)||[])[0];
+    const out=players.map(p=>{
+      let s=0;
+      if(num && p.no && String(parseInt(p.no,10))===String(parseInt(num,10))) s = mode==="no" ? 1.05 : 1.01;
+      if(mode!=="no" || !num){
+        const pt=part.replace(/\d+/g,"");
+        namesOf(p).forEach((c,i)=>{ let b=best(c,pt).score; if(i>0) b-=.02; s=Math.max(s,b); });
+        if(pt.length===1 && norm(p.name)[0]===pt) s=Math.max(s,.5);     // 只聽到姓：列為候選
+      }
+      return {p,score:s};
+    }).sort((a,b)=>b.score-a.score);
+    return out;
+  }
+  /**
+   * texts：辨識結果（含備選）；ctx：{players, actions, mode}
+   * 回傳 {cancel} 或 {player, action, sure, candidates, actionCandidates, text}
+   */
+  function parse(texts,ctx){
+    const list=[...new Set((texts||[]).map(norm).filter(Boolean))];
+    if(!list.length) return null;
+    if(list.some(isCancel) && isCancel(list[0])) return {cancel:true,text:list[0]};
+    let bestR=null;
+    list.forEach((t,ti)=>{
+      const act=findAction(t,ctx.actions);
+      const part = (act ? t.slice(0,act.start)+" "+t.slice(act.end) : t).replace(FILL,"").replace(/\s+/g,"");
+      const ranked=rankPlayers(part,ctx.players,ctx.mode);
+      const top=ranked[0]||{score:0}, second=ranked[1]||{score:0};
+      const total=(act?act.score:0)+top.score - ti*.03;
+      if(!bestR||total>bestR.total) bestR={t,act,ranked,top,second,total};
+    });
+    const {t,act,ranked,top,second}=bestR;
+    const sure = top.score>=.72 && (top.score-second.score>=.12 || (top.score>=1 && second.score<1));
+    return {
+      text:t, action:act?act.a:null, actionSure:!!act && act.score>=.8,
+      player: top.score>=.4 ? top.p : null, sure: sure && !!act,
+      playerSure: sure,
+      candidates: ranked.filter(x=>x.score>=.4).slice(0,4).map(x=>x.p)
+    };
+  }
+  return {parse,norm,best,toks,cnNum,_sim:sim};
+})();
+
+/* ====================== 語音：按住說話 ====================== */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, holding=false, finals=[], interim="", recErr="";
+const vBtn=$("voiceBtn");
+(function voiceSupport(){
+  const line=/\bLine\//i.test(navigator.userAgent);
+  if(!SR||line){
+    vBtn.hidden=true; $("noVoice").hidden=false;
+    $("noVoice").textContent = line ? "LINE 內建瀏覽器不支援語音，請改用 Chrome 或 Safari 開啟；也可以直接用下面的按鈕點選。"
+      : "這個瀏覽器不支援語音輸入（建議 Android Chrome 或 iPhone Safari），請用下面的按鈕點選。";
+  }
+})();
+function startListen(){
+  if(!SR||holding) return;
+  if(!prefs.match){ $("heard").textContent="請先建立或選擇場次"; return; }
+  holding=true; finals=[]; interim=""; recErr="";
+  vBtn.classList.add("on"); $("voiceLabel").textContent="聽你說…"; $("heard").innerHTML="&nbsp;";
+  try{
+    rec=new SR(); rec.lang="zh-TW"; rec.interimResults=true; rec.continuous=true; rec.maxAlternatives=5;
+    rec.onresult=e=>{
+      interim="";
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const r=e.results[i];
+        if(r.isFinal){ const alts=[]; for(let j=0;j<r.length;j++) alts.push(r[j].transcript); finals.push(alts); }
+        else interim+=r[0].transcript;
+      }
+      $("heard").innerHTML="<b>"+esc(finals.map(a=>a[0]).join("")+interim)+"</b>";
+    };
+    rec.onerror=e=>{ recErr=e.error; };
+    rec.onend=()=>{ if(holding){ try{ rec.start(); return; }catch(e){} } finishListen(); };   // 還按著就繼續聽
+    rec.start();
+  }catch(e){ recErr="start"; stopListen(); }
+}
+function stopListen(){
+  if(!holding) return;
+  holding=false; vBtn.classList.remove("on"); $("voiceLabel").textContent="辨識中…";
+  try{ rec&&rec.stop(); }catch(e){ finishListen(); }
+  setTimeout(()=>{ if($("voiceLabel").textContent==="辨識中…") finishListen(); },2500);   // 保險：有些手機不會觸發 onend
+}
+function finishListen(){
+  if(!rec) return; const r=rec; rec=null; r.onend=null;
+  $("voiceLabel").textContent="按住說話";
+  // 組合出幾個候選句：每段第一選擇串起來＋單段的各個備選
+  let texts=[finals.map(a=>a[0]).join("")+interim];
+  if(finals.length===1) texts=texts.concat(finals[0].slice(1));
+  texts=texts.filter(s=>s&&s.trim());
+  if(!texts.length){
+    $("heard").textContent = recErr==="not-allowed"||recErr==="service-not-allowed" ? "沒有麥克風權限：請到瀏覽器設定允許此網站使用麥克風。"
+      : recErr==="network" ? "語音辨識需要網路，請改用下面的按鈕。" : "沒聽到聲音，再按住說一次。";
+    return;
+  }
+  handleSpeech(texts);
+}
+vBtn.addEventListener("pointerdown",e=>{ e.preventDefault(); try{vBtn.setPointerCapture(e.pointerId);}catch(_){} startListen(); });
+["pointerup","pointercancel","lostpointercapture"].forEach(ev=>vBtn.addEventListener(ev,()=>stopListen()));
+vBtn.addEventListener("contextmenu",e=>e.preventDefault());
+vBtn.addEventListener("keydown",e=>{ if((e.key===" "||e.key==="Enter")&&!e.repeat){ e.preventDefault(); startListen(); } });
+vBtn.addEventListener("keyup",e=>{ if(e.key===" "||e.key==="Enter"){ e.preventDefault(); stopListen(); } });
+
+/* ====================== 確認卡片 ====================== */
+let card=null, cardTimer=null;
+function handleSpeech(texts){
+  const ctx={players:playersOf(curTeam()),actions:actions(),mode:prefs.mode};
+  const r=VS.parse(texts,ctx); if(!r) return;
+  $("heard").innerHTML="聽到：<b>"+esc(texts[0])+"</b>";
+  if(r.cancel){
+    if(card){ closeCard(); $("heard").innerHTML="已取消，沒有記錄。"; return; }
+    const last=Object.values(local.events).filter(e=>e.st!=="undone"&&e.match===prefs.match).sort((a,b)=>b.t-a.t)[0];
+    if(last && Date.now()-last.t<120000) undoEvent(last.id); else $("heard").textContent="沒有可撤銷的紀錄（只能撤銷 2 分鐘內的上一筆，其他請點「撤銷」）";
+    return;
+  }
+  if(card&&card.player&&card.action) commitCard(); else closeCard();   // 上一張還在倒數就先記下
+  openCard({said:texts[0],player:r.playerSure?r.player:null,action:r.actionSure?r.action:null,candidates:r.candidates,guessAction:r.action});
+}
+if(DEMO) window.vsSimulateSpeech = t => handleSpeech([].concat(t));   // 示範模式：在主控台模擬語音
+function openCard(c){
+  card=c; clearTimeout(cardTimer);
+  const ready=c.player&&c.action;
+  const t=c.player?teamOf(c.player.team):null;
+  let body="";
+  if(ready){
+    body=`<div class="what"><span class="tp" style="--tc:${t.color};--tf:${t.fg}">${esc(c.player.name)}</span>${esc(c.action.name)}
+      <span class="chip ${c.action.cat==="失誤"?"tag-err":"tag-ok"}">${c.action.cat} ${c.action.cat==="失誤"?"−":"+"}${c.action.value}</span></div>`;
+  } else {
+    if(c.player) body+=`<div class="what"><span class="tp" style="--tc:${t.color};--tf:${t.fg}">${esc(c.player.name)}</span></div>`;
+    if(!c.player){
+      const cands=c.candidates.length?c.candidates:playersOf(curTeam());
+      body+=`<p class="q">${c.candidates.length?"是哪一位？":"聽不出是誰，請點選："}</p><div class="opts">${cands.map(p=>playerBtn(p,"")).join("")}</div>`;
+    }
+    if(c.action) body+=`<p class="q" style="margin-top:10px">動作：${esc(c.action.name)}</p>`;
+    else body+=`<p class="q" style="margin-top:10px">${c.guessAction?"是「"+esc(c.guessAction.name)+"」嗎？":"什麼動作？"}</p><div class="opts">${actions().map(a=>actionBtn(a,"")).join("")}</div>`;
+  }
+  $("sheet").innerHTML=`<div class="card" role="dialog" aria-label="確認紀錄">${ready?`<div class="bar" id="cardBar"></div>`:""}
+    <p class="said">聽到「${esc(c.said)}」${ready?"・倒數後自動記錄":""}</p>${body}
+    <div class="acts"><button type="button" class="btn danger" data-card="cancel">取消</button>${ready?`<button type="button" class="btn" data-card="ok">送出</button>`:""}</div></div>`;
+  $("sheet").hidden=false; $("toast").hidden=true;
+  if(ready){
+    const bar=$("cardBar");
+    if(bar && bar.animate) bar.animate([{width:"100%"},{width:"0%"}],{duration:CONFIRM_MS,easing:"linear",fill:"forwards"});
+    cardTimer=setTimeout(commitCard,CONFIRM_MS);
+  }
+}
+function commitCard(){ if(!card||!card.player||!card.action) return; const c=card; closeCard(); addEvent(c.player.id,c.action.code,"voice",c.said); }
+function closeCard(){ clearTimeout(cardTimer); card=null; $("sheet").hidden=true; $("sheet").innerHTML=""; }
+$("sheet").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b||!card) return;
+  if(b.dataset.card==="cancel"){ closeCard(); $("heard").textContent="已取消，沒有記錄。"; return; }
+  if(b.dataset.card==="ok") return commitCard();
+  if(b.dataset.player) card.player=playerBy(b.dataset.player);
+  if(b.dataset.action) card.action=actionBy(b.dataset.action);
+  if(card.player&&card.action) commitCard(); else openCard(card);
+});
+
+/* ====================== 數據頁 ====================== */
+let statsFilter="all", openRow=null;
+async function refreshStats(){
+  if(!auth) return;
+  try{
+    const r=await api({action:"events",token:auth.token});
+    if(!r.ok){ if(r.error==="auth") needAuth(); return; }
+    serverEvents=r.events; store.set(K("server"),serverEvents); lastStats=Date.now(); setOffline(false);
+    // 伺服器已收到的就不再是待送
+    renderStats();
+  }catch(e){ setOffline(true); }
+}
+function mergedEvents(){
+  const map={}; serverEvents.forEach(e=>map[e.id]=e);
+  Object.values(local.events).forEach(e=>{ if(e.st==="undone"||e.st==="rejected") delete map[e.id]; else if(!map[e.id]) map[e.id]=Object.assign({},e,{local:true}); });
+  return Object.values(map);
+}
+function renderStats(){
+  if(!auth||!boot) return;
+  const k=isAdmin()?(prefs.statsTeam&&teams().some(t=>t.key===prefs.statsTeam)?prefs.statsTeam:curTeam()):auth.scope;
+  $("statsTeamRow").hidden=!isAdmin();
+  if(isAdmin()) $("statsTeamSel").innerHTML=teams().map(t=>`<option value="${t.key}" ${t.key===k?"selected":""}>${esc(t.key+"｜"+t.name)}</option>`).join("");
+  const ms=matchesOf(k);
+  if(statsFilter!=="all"&&!ms.some(m=>m.id===statsFilter)) statsFilter="all";
+  $("statsFilter").innerHTML=`<button type="button" data-f="all" aria-pressed="${statsFilter==="all"}">全部場次</button>`+
+    ms.map(m=>`<button type="button" data-f="${esc(m.id)}" aria-pressed="${statsFilter===m.id}">${esc(matchLabel(m)||"未命名")}</button>`).join("");
+  const evs=mergedEvents().filter(e=>e.team===k&&(statsFilter==="all"||e.match===statsFilter));
+  const rows={}; allPlayersOf(k).forEach(p=>rows[p.id]={p,pt:0,er:0,by:{},pending:0});
+  evs.forEach(e=>{ const r=rows[e.player]; if(!r) return; const v=Number(e.value)||1; if(e.cat==="失誤") r.er+=v; else r.pt+=v; r.by[e.action]=(r.by[e.action]||0)+1; if(e.local) r.pending++; });
+  const list=Object.values(rows).filter(r=>r.p.active!==false||r.pt||r.er).sort((a,b)=>(b.pt-b.er)-(a.pt-a.er)||b.pt-a.pt||a.er-b.er);
+  const pt=list.reduce((s,r)=>s+r.pt,0), er=list.reduce((s,r)=>s+r.er,0);
+  $("sumPt").textContent=pt; $("sumEr").textContent=er; $("sumNet").textContent=(pt-er>0?"+":"")+(pt-er); $("sumNet").parentNode.className="stat-tile "+(pt-er>0?"pt":pt-er<0?"er":"");
+  const t=teamOf(k);
+  $("statsTable").innerHTML=`<thead><tr><th>隊員</th><th class="n">得分</th><th class="n">失誤</th><th class="n">淨值</th></tr></thead><tbody>`+
+    (list.length?list.map(r=>{
+      const net=r.pt-r.er, zero=!r.pt&&!r.er;
+      const det = openRow===r.p.id ? `<tr class="detail"><td colspan="4"><div class="brk">${actions().filter(a=>r.by[a.code]).map(a=>`<span class="chip ${a.cat==="失誤"?"tag-err":"tag-ok"}">${esc(a.name)} × ${r.by[a.code]}</span>`).join("")||"尚無紀錄"}</div></td></tr>` : "";
+      return `<tr class="row ${zero?"zero":""}" data-row="${esc(r.p.id)}" aria-expanded="${openRow===r.p.id}"><td><span class="pl"><i style="background:${t.color}"></i>${esc(r.p.name)}${r.p.no?`<small>#${esc(r.p.no)}</small>`:""}</span></td>
+        <td class="n">${r.pt}</td><td class="n">${r.er}</td><td class="n ${net>0?"pos":net<0?"neg":""}">${net>0?"+":""}${net}</td></tr>${det}`;
+    }).join(""):`<tr><td colspan="4" style="text-align:center;color:var(--muted)">沒有隊員資料</td></tr>`)+`</tbody>`;
+  const pend=list.reduce((s,r)=>s+r.pending,0);
+  $("statsNote").textContent = (pend?` 含這台手機尚未送出的 ${pend} 筆。`:"") + (lastStats?` 伺服器資料更新於 ${hhmm(lastStats)}。`:"");
+}
+$("statsFilter").addEventListener("click",e=>{ const b=e.target.closest("[data-f]"); if(!b) return; statsFilter=b.dataset.f; renderStats(); });
+$("statsTeamSel").addEventListener("change",e=>{ prefs.statsTeam=e.target.value; savePrefs(); statsFilter="all"; renderStats(); });
+$("statsTable").addEventListener("click",e=>{ const tr=e.target.closest("[data-row]"); if(!tr) return; openRow=openRow===tr.dataset.row?null:tr.dataset.row; renderStats(); });
+
+/* ====================== 隊伍管理 ====================== */
+const mgrTeam = () => isAdmin() ? (teams().some(t=>t.key===prefs.mgrTeam) ? prefs.mgrTeam : (teams()[0]||{}).key) : (auth&&auth.scope);
+function renderTeam(){
+  if(!auth) return;
+  const k=mgrTeam(), t=k&&teams().find(x=>x.key===k);
+  $("mgrTeamRow").hidden=!isAdmin();
+  if(isAdmin()) $("mgrTeamSel").innerHTML=teams().map(x=>`<option value="${x.key}" ${x.key===k?"selected":""}>${esc(x.name)}（${x.key}）</option>`).join("");
+  $("mgrEmpty").hidden=!!t; $("mgrBody").hidden=!t;
+  if(!t){ $("mgrEmpty").textContent = boot ? "還沒有任何隊伍。" : "載入中…（需要連線）"; return; }
+  $("codeBox").hidden=isAdmin();
+  $("teamCode").textContent=(boot&&boot.code)||"——";
+  if(document.activeElement!==$("teamName")) $("teamName").value=t.name;
+  if($("teamColor").dataset.team!==k || !$("teamColor").children.length){ renderSwatches($("teamColor"),t.color); $("teamColor").dataset.team=k; }
+  const ps=allPlayersOf(k).slice().sort((a,b)=>(b.active!==false)-(a.active!==false) || (parseInt(a.no)||999)-(parseInt(b.no)||999) || a.id.localeCompare(b.id));
+  const on=ps.filter(p=>p.active!==false).length;
+  $("rosterCount").textContent = ps.length ? `${on} 人${ps.length>on?`・停用 ${ps.length-on} 人`:""}` : "";
+  $("plist").innerHTML = ps.length ? ps.map(p=>`<li class="${p.active===false?"off":""}"><i class="dot" style="background:${t.color}"></i>
+      <span class="no">${p.no?esc(p.no):"–"}</span>
+      <span class="nm">${esc(p.name)}<small>${p.active===false?"已停用":(p.alias&&p.alias.length?"綽號："+esc(p.alias.join("、")):"未設綽號")}</small></span>
+      <button type="button" data-edit="${esc(p.id)}">編輯</button></li>`).join("")
+    : `<li style="justify-content:center;color:var(--muted)">還沒有隊員，用上面的表單新增</li>`;
+}
+async function teamCall(op, data, msgEl){
+  const k=mgrTeam(); if(!k) return null;
+  if(msgEl){ msgEl.className="msg"; msgEl.textContent="儲存中…"; }
+  try{
+    const r=await api(Object.assign({action:"team",token:auth.token,team:k,op},data||{}));
+    if(!r.ok){
+      if(r.error==="auth"){ needAuth(); return null; }
+      if(msgEl){ msgEl.className="msg err"; msgEl.textContent = r.error==="bad_name"?"請輸入名字。":r.error==="too_many_players"?"隊員已達上限（40 人）。":"儲存失敗："+(r.message||r.error); }
+      return null;
+    }
+    boot.teams=teams().map(x=>x.key===k&&r.teams&&r.teams[0]?r.teams[0]:x);
+    boot.players=((boot.players)||[]).filter(p=>p.team!==k).concat(r.players||[]);
+    if(r.code&&!isAdmin()) boot.code=r.code;
+    if(r.token){ auth.token=r.token; store.set("vs-auth",auth); }
+    store.set(K("boot"),boot); setOffline(false);
+    if(msgEl){ msgEl.textContent=""; }
+    renderAll(); renderTeam();
+    return r;
+  }catch(e){ setOffline(true); if(msgEl){ msgEl.className="msg err"; msgEl.textContent="需要連線才能修改隊伍資料。"; } return null; }
+}
+$("mgrTeamSel").addEventListener("change",e=>{ prefs.mgrTeam=e.target.value; savePrefs(); $("teamColor").dataset.team=""; renderTeam(); });
+$("teamForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const r=await teamCall("rename",{name:$("teamName").value.trim(),color:$("teamColor").dataset.value},$("teamMsg"));
+  if(r){ $("teamName").blur(); showToast("已儲存隊名與代表色"); }
+});
+$("addPlayerForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const name=$("apName").value.trim(); if(!name) return;
+  $("apBtn").disabled=true;
+  const r=await teamCall("addPlayer",{name,no:$("apNo").value.trim(),alias:$("apAlias").value.trim()},$("apMsg"));
+  $("apBtn").disabled=false;
+  if(r){ showToast("已新增："+name); $("apName").value=""; $("apNo").value=""; $("apAlias").value=""; $("apName").focus(); }
+});
+let editing=null;
+$("plist").addEventListener("click",e=>{
+  const b=e.target.closest("[data-edit]"); if(!b) return;
+  const p=playerBy(b.dataset.edit); if(!p) return;
+  editing=p.id; $("epName").value=p.name; $("epNo").value=p.no||""; $("epAlias").value=(p.alias||[]).join("、"); $("epActive").checked=p.active!==false;
+  $("playerDlg").showModal();
+});
+$("playerDlg").addEventListener("close",async ()=>{
+  if($("playerDlg").returnValue!=="ok"||!editing) return;
+  const id=editing; editing=null;
+  const r=await teamCall("updatePlayer",{id,name:$("epName").value.trim(),no:$("epNo").value.trim(),alias:$("epAlias").value.trim(),active:$("epActive").checked},$("apMsg"));
+  if(r) showToast("已更新隊員");
+});
+$("shareCode").addEventListener("click",()=>{ const t=teamOf(mgrTeam()); shareCode(t.name,boot&&boot.code); });
+$("copyCode").addEventListener("click",()=>copyText((boot&&boot.code)||""));
+$("regenCode").addEventListener("click",async ()=>{
+  if(!confirm("重設後舊代碼會立即失效，其他已登入的手機都要用新代碼重新登入。確定重設？")) return;
+  const r=await teamCall("regenCode",{},null);
+  if(r) showToast("新代碼："+r.code);
+});
+
+/* ====================== 分頁 ====================== */
+let currentTab="rec";
+const tabs=[$("t-rec"),$("t-stats"),$("t-team")];
+function show(id){
+  currentTab=id;
+  tabs.forEach(t=>{ const on=t.getAttribute("aria-controls")===id; t.setAttribute("aria-selected",on); t.tabIndex=on?0:-1; $(t.getAttribute("aria-controls")).hidden=!on; });
+  if(id==="stats"){ renderStats(); refreshStats(); }
+  if(id==="team"){ renderTeam(); if(Date.now()-lastBoot>15000) refreshBoot(); }
+  try{ history.replaceState(null,"","#"+id); }catch(e){}
+}
+tabs.forEach((t,i)=>{ t.addEventListener("click",()=>show(t.getAttribute("aria-controls")));
+  t.addEventListener("keydown",e=>{ if(e.key==="ArrowRight"||e.key==="ArrowLeft"){ const n=tabs[(i+(e.key==="ArrowRight"?1:tabs.length-1))%tabs.length]; n.focus(); show(n.getAttribute("aria-controls")); } }); });
+
+/* ====================== 安裝成 App（PWA） ====================== */
+const standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+const inLine = /\bLine\//i.test(navigator.userAgent);
+document.documentElement.classList.toggle("is-app", standalone);
+let deferredPrompt=null;
+function showInstall(){
+  if(standalone || inLine) return;
+  if(deferredPrompt){
+    $("installBox").hidden=false; $("installBtn").hidden=false; $("footInstall").hidden=false;
+    $("installText").innerHTML="<b>裝成 App</b>：放在主畫面、全螢幕開啟，沒網路也打得開。";
+  } else if(isIOS){
+    $("installBox").hidden=false; $("installBtn").hidden=true; $("footInstall").hidden=true;
+    $("installText").innerHTML="<b>裝成 App</b>：用 Safari 開啟 → 點下方「分享」<svg aria-hidden=\"true\" width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" style=\"vertical-align:-2px\"><path d=\"M12 3v12M7.5 7.5 12 3l4.5 4.5M6 11H4.5v10h15V11H18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg> → 往下滑找「加入主畫面」。";
+  }
+}
+async function doInstall(){
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  try{ await deferredPrompt.userChoice; }catch(e){}
+  deferredPrompt=null; $("installBox").hidden=true; $("footInstall").hidden=true;
+}
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferredPrompt=e; showInstall(); });
+window.addEventListener("appinstalled",()=>{ deferredPrompt=null; $("installBox").hidden=true; $("footInstall").hidden=true; });
+$("installBtn").addEventListener("click",doInstall);
+$("footInstall").addEventListener("click",doInstall);
+showInstall();
+if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
+/* ====================== 開始 ====================== */
+if(auth && auth.token){ enterApp(false).then(()=>{ if(location.hash==="#stats"||location.hash==="#team") show(location.hash.slice(1)); }); }
+else showLogin();
+
+})();
+</script>
+</body>
+</html>
