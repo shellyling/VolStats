@@ -4,10 +4,11 @@
  * - 送到 Apps Script 的 POST 一律不碰（離線佇列由頁面自己處理）
  * 改版時把 VERSION 加 1 可強制清掉舊快取。
  */
-const VERSION = "vs-v2";
+const VERSION = "vs-v4";   // v4：讀音字典改放自己 repo
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
-  "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png", "./icons/favicon-64.png"];
-const CDN = ["fonts.googleapis.com", "fonts.gstatic.com", "cdn.jsdelivr.net"];
+  "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png", "./icons/apple-touch-icon.png", "./icons/favicon-64.png",
+  "./vendor/pinyin-pro-3.28.0.min.js"];
+const CDN = ["fonts.googleapis.com", "fonts.gstatic.com"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
