@@ -832,7 +832,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
 
 <dialog id="setDlg">
   <h3 id="setTitle">第 1 局結束</h3>
-  <p class="note" style="margin:0" id="setNote">比分已依這台手機的紀錄帶入，可以直接修改。</p>
+  <p class="note" style="margin:0" id="setNote">比分已依這一局的紀錄帶入，可以直接修改。</p>
   <div class="sc-in">
     <label class="field"><span>我方</span><input id="scUs" type="number" inputmode="numeric" min="0" max="99"></label>
     <span class="colon">:</span>
@@ -847,7 +847,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
   <p class="note" style="margin:0" id="csvScope"></p>
   <div class="csv-opts">
     <button type="button" data-csv="sum">球員統計<small>每位隊員一列：得分、失誤、淨值、效率、表現、局勝率、各動作次數</small></button>
-    <button type="button" data-csv="raw">逐筆紀錄<small>每一筆紀錄一列：日期、對手、局、隊員、動作</small></button>
+    <button type="button" data-csv="raw">逐筆紀錄<small>每一球一列：時間、隊員、動作、當下比分、發球方、輪轉、站位（含對方得失分，適合丟給 AI 分析）</small></button>
   </div>
   <p class="note">用 Excel、Numbers 或 Google 試算表都能直接開啟。</p>
   <div class="acts"><button class="btn ghost" type="button" id="csvClose">關閉</button></div>
@@ -989,7 +989,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
         <li><b>點場上的隊員 → 選動作</b><span>動作會依站位縮減（後排沒有攔網、只有發球的人有發球），需要時按「顯示全部動作」。</span></li>
         <li><b>自動輪轉</b><span>我方從對方手上拿回發球權時自動轉一格；也可以手動「輪轉／退回」、「換人」、「自由上場／下場」。</span></li>
       </ol>
-      <p class="note">站位只存在記錄的那台手機；撤銷紀錄時比分和站位會一起退回。</p>
+      <p class="note">站位和輪轉會同步到伺服器，換手機用同一組代碼登入就能接著記；撤銷紀錄時比分和站位會一起退回。同一局請只由一台手機排站位、按對方得失分，避免重複。</p>
     </section>
 
     <section class="hsec" id="h-stats">
@@ -1026,7 +1026,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
       <ol class="guide">
         <li><b>到「隊伍」分頁按「分享」</b><span>會把網址和記錄碼一起傳出去（LINE、訊息都可以）。</span></li>
         <li><b>隊友打開網址 → 輸入記錄碼</b><span>建議請隊友也先安裝成 App。</span></li>
-        <li><b>分工記錄</b><span>例如正男記前排、妮妮記後排，大家的紀錄會合併到同一份數據。</span></li>
+        <li><b>分工記錄</b><span>例如正男記前排、妮妮記後排，大家的紀錄和比分會合併。「對方失誤／對方得分」和站位請只交給其中一人按，才不會重複算。</span></li>
       </ol>
       <button type="button" class="btn ghost" id="helpShare" style="width:100%;margin-top:6px">分享網址與記錄碼</button>
     </section>
@@ -1046,7 +1046,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
       <h4><i>11</i>常見問題</h4>
       <ul>
         <li><b>按住說話沒反應？</b>確認不是在 LINE 裡開啟、已允許麥克風、手機有網路。iPhone 主畫面 App 若無法使用語音，可改用 Safari 開同一個網址（用同一組代碼登入），或改用點按。</li>
-        <li><b>換手機可以接著記嗎？</b>可以，用同一組代碼登入，紀錄和比分都在。但站位輪轉的排先發只在原本那台手機。</li>
+        <li><b>換手機可以接著記嗎？</b>可以，用同一組代碼登入，紀錄、比分、站位和輪轉都會接上（需要連線讀一次）。</li>
         <li><b>跳出「需要重新登入」？</b>代碼被重設或登入超過 24 小時，重新輸入代碼即可；沒送出的紀錄會自動補送。</li>
         <li><b>網站更新了但畫面沒變？</b>把 App 完全關掉再開一次；還是舊的就關掉後再開第二次。</li>
         <li><b>要怎麼移除？</b>長按主畫面圖示 →「移除 App」或「解除安裝」，伺服器上的資料不受影響。</li>
@@ -1115,8 +1115,8 @@ const demoApi = (function(){
     ["RERR","接發失誤","失誤","接發失誤、接發球失誤、接球失誤、一傳失誤"],["FAULT","違例","失誤","違例、犯規、持球、連擊、過中線、踩線"],
     ["RBAD","接發未到位","表現","接發未到位、接發不到位、一傳不到位、一傳沒到位"],["SBAD","舉球未到位","表現","舉球未到位、舉球不到位、舉球沒到位、舉偏"],
     ["CBAD","機會球沒到位","表現","機會球沒到位、機會球不到位、機會球未到位"],["DIG","救球成功","表現","救球成功、救起來、防守成功、好球救起"]].map((a,i)=>({code:a[0],name:a[1],cat:a[2],value:a[2]==="表現"?0:1,keys:a[3].split("、"),order:i+1}));
-  const seed = () => ({teams:[],players:[],codes:{},matches:[],events:[],scores:[],fails:{},made:{}});
-  let db = store.get("vs-demo-db2") || seed(); db.scores=db.scores||[];
+  const seed = () => ({teams:[],players:[],codes:{},matches:[],events:[],scores:[],courts:[],fails:{},made:{}});
+  let db = store.get("vs-demo-db2") || seed(); db.scores=db.scores||[]; db.courts=db.courts||[];
   const alive = id => { const m=db.matches.find(x=>x.id===id); return !!m&&!m.deleted; };
   const save = () => store.set("vs-demo-db2",db);
   const POSV = v => ["舉球","砲位","欄中","副位","自由"].includes(v)?v:"";
@@ -1153,8 +1153,8 @@ const demoApi = (function(){
       const a=auth(p.token);
       const codeOf = k => Object.keys(db.codes).find(c=>db.codes[c]===k)||"";
       const recOf = k => { let c=codeOf(k+"~r"); if(!c&&k){ c=newCode(); db.codes[c]=k+"~r"; save(); } return c; };
-      if(p.action==="bootstrap") return {ok:true,scope:a.scope,admin:a.admin,serverTime:Date.now(),teams:db.teams.filter(t=>a.canSee(t.key)),players:db.players.filter(x=>a.canSee(x.team)),actions:ACTIONS,matches:db.matches.filter(m=>a.canSee(m.team)&&!m.deleted),scores:db.scores.filter(x=>a.canSee(x.team)&&alive(x.match)),role:a.role,code:a.role==="mgr"?codeOf(a.scope):"",recCode:a.admin?"":recOf(a.scope)};
-      if(p.action==="events") return {ok:true,serverTime:Date.now(),events:db.events.filter(e=>e.status==="有效"&&a.canSee(e.team)&&!(db.matches.find(m=>m.id===e.match)||{}).deleted).map(e=>({id:e.id,match:e.match,set:e.set,team:e.team,player:e.player,action:e.action,cat:e.cat,value:e.value}))};
+      if(p.action==="bootstrap") return {ok:true,scope:a.scope,admin:a.admin,serverTime:Date.now(),teams:db.teams.filter(t=>a.canSee(t.key)),players:db.players.filter(x=>a.canSee(x.team)),actions:ACTIONS,matches:db.matches.filter(m=>a.canSee(m.team)&&!m.deleted),scores:db.scores.filter(x=>a.canSee(x.team)&&alive(x.match)),courts:db.courts.filter(x=>a.canSee(x.team)&&alive(x.match)),role:a.role,code:a.role==="mgr"?codeOf(a.scope):"",recCode:a.admin?"":recOf(a.scope)};
+      if(p.action==="events") return {ok:true,serverTime:Date.now(),events:db.events.filter(e=>e.status==="有效"&&a.canSee(e.team)&&!(db.matches.find(m=>m.id===e.match)||{}).deleted).map(e=>e.opp?{id:e.id,t:e.t,match:e.match,set:e.set,team:e.team,action:e.action,opp:e.opp,cat:"對方",value:0}:{id:e.id,t:e.t,match:e.match,set:e.set,team:e.team,player:e.player,action:e.action,cat:e.cat,value:e.value})};
       if(p.action==="team"){
         const team=a.admin?String(p.team||""):a.scope, t=db.teams.find(x=>x.key===team);
         if(!t||!a.canSee(team)) return {ok:false,error:"forbidden"};
@@ -1184,9 +1184,13 @@ const demoApi = (function(){
           else if(op.op==="add"){ const e=op.ev; if(db.events.some(x=>x.id===e.id)) return done.push(op.key);
             const team=a.admin?e.team:a.scope; if(!a.canSee(team)) return rej("forbidden");
             const m=db.matches.find(x=>x.id===e.match&&!x.deleted); if(!m||m.team!==team) return rej("bad_match");
+            if(e.action==="OPP_ERR"||e.action==="OPP_PT"){ db.events.push({id:e.id,t:Date.parse(e.deviceTime)||Date.now(),match:m.id,set:e.set,team,action:e.action,opp:e.action==="OPP_ERR"?"pt":"er",cat:"對方",value:0,sc:e.sc,status:"有效"}); return done.push(op.key); }
             const pl=db.players.find(x=>x.id===e.player); if(!pl||pl.team!==team) return rej("bad_player");
             const ac=ACTIONS.find(x=>x.code===e.action); if(!ac) return rej("bad_action");
-            db.events.push({id:e.id,match:m.id,set:e.set,team,player:pl.id,action:ac.code,cat:ac.cat,value:ac.value,status:"有效"}); done.push(op.key); }
+            db.events.push({id:e.id,t:Date.parse(e.deviceTime)||Date.now(),match:m.id,set:e.set,team,player:pl.id,action:ac.code,cat:ac.cat,value:ac.value,sc:e.sc,status:"有效"}); done.push(op.key); }
+          else if(op.op==="court"){ const c=op.c||{}, m=db.matches.find(x=>x.id===c.match&&!x.deleted); if(!m||!a.canSee(m.team)) return rej("bad_match");
+            const old=db.courts.find(x=>x.match===m.id&&x.set===c.set); if(old&&old.upd>c.upd) return done.push(op.key);
+            db.courts=db.courts.filter(x=>x!==old); db.courts.push({match:m.id,team:m.team,set:c.set,lineup:c.lineup,serve:c.serve,libero:c.libero||"",t0:c.t0,log:c.log||[],upd:c.upd}); done.push(op.key); }
           else if(op.op==="score"){ const m=db.matches.find(x=>x.id===op.s.match&&!x.deleted); if(!m||!a.canSee(m.team)) return rej("bad_match");
             const set=Math.round(op.s.set), us=Math.round(op.s.us), them=Math.round(op.s.them);
             if(!(set>=1&&set<=5)) return rej("bad_set"); if(!(us>=0&&us<=99&&them>=0&&them<=99)) return rej("bad_score");
@@ -1220,7 +1224,10 @@ function loadLocal(){
   local.court = local.court || {}; local.scores = local.scores || {};
   queue = store.get(K("queue"),[]);
   serverEvents = store.get(K("server"),[]);
+  // 舊版的「對方失誤／對方得分」只存在這台手機：補送到伺服器
+  Object.values(local.events).forEach(e=>{ if(e.opp&&e.st==="local"&&!e.tried){ e.tried=1; e.st="pending"; queue.push(oppOp(e)); } });
 }
+const oppOp = e => ({op:"add",key:"a:"+e.id,ev:{id:e.id,deviceTime:new Date(e.t).toISOString(),match:e.match,set:e.set,team:e.team,action:e.opp==="pt"?"OPP_ERR":"OPP_PT",source:e.source||"tap",transcript:e.transcript||"",sc:e.sc||{}}});
 const saveLocal = () => { store.set(K("local"),local); store.set(K("queue"),queue); };
 const savePrefs = () => store.set("vs-prefs",prefs);
 
@@ -1332,7 +1339,7 @@ async function enterApp(fresh){
   $("viewLogin").hidden=true; $("viewApp").hidden=false; $("who").hidden=false;
   renderAll();
   await refreshBoot(fresh);
-  flush();
+  flush(); refreshStats();
 }
 
 async function refreshBoot(){
@@ -1342,6 +1349,10 @@ async function refreshBoot(){
     boot=r; store.set(K("boot"),boot); lastBoot=Date.now();
     // 伺服器已有的場次就不必再留本機副本
     (boot.matches||[]).forEach(m=>{ if(local.matches[m.id] && !queue.some(q=>q.op==="match"&&q.m.id===m.id)) delete local.matches[m.id]; });
+    // 伺服器上的站位：比這台手機的新（例如在別台手機記的）就採用
+    (boot.courts||[]).forEach(sc=>{ const k=sc.match+"|"+sc.set, lc=local.court[k];
+      if(queue.some(q=>q.op==="court"&&q.k===k)) return;
+      if(!lc || (sc.upd||0)>(lc.upd||0)) local.court[k]={lineup:sc.lineup,serve:sc.serve,libero:sc.libero||"",t0:sc.t0||0,log:sc.log||[],upd:sc.upd||0}; });
     saveLocal(); renderAll();
   }catch(e){ setOffline(true); if(!boot) $("heard").textContent="離線中，且這台手機還沒有名單快取，請連上網路。"; }
 }
@@ -1353,19 +1364,23 @@ function addEvent(playerId, actionCode, source, transcript){
   const p=playerBy(playerId), a=actionBy(actionCode), m=prefs.match;
   if(!p||!a||!m) return null;
   const ev={id:uid(),deviceTime:new Date().toISOString(),t:Date.now(),match:m,set:prefs.set,team:p.team,player:p.id,action:a.code,cat:a.cat,value:a.value,source,transcript:transcript||"",st:"pending"};
-  local.events[ev.id]=ev;
-  queue.push({op:"add",key:"a:"+ev.id,ev:{id:ev.id,deviceTime:ev.deviceTime,match:ev.match,set:ev.set,team:ev.team,player:ev.player,action:ev.action,source,transcript:ev.transcript}});
+  local.events[ev.id]=ev; ev.sc=snapOf(ev);
+  queue.push({op:"add",key:"a:"+ev.id,ev:{id:ev.id,deviceTime:ev.deviceTime,match:ev.match,set:ev.set,team:ev.team,player:ev.player,action:ev.action,source,transcript:ev.transcript,sc:ev.sc}});
   saveLocal(); renderRecent(); renderStats(); flush();
   if(navigator.vibrate) navigator.vibrate(30);
   showToast(`已記：${p.name} ${a.name} ${signOf(a)}`.trim(), ev.id);
   renderScore(); if(prefs.court) renderPlayers();
   return ev;
 }
+/** 這一筆記下時的狀態：這一球之後的比分、這一球的發球方、第幾輪、這位隊員的站位 */
+function snapOf(ev){
+  const ann={}; rally(ev.match,ev.set,ann); const x=ann[ev.id]||{};
+  return {us:x.us,them:x.them,serve:x.serve||"",rot:x.rot||"",slot:x.slot||""};
+}
 function undoEvent(id){
   const ev=local.events[id]; if(!ev||ev.st==="undone") return;
   const i=queue.findIndex(q=>q.op==="add"&&q.ev.id===id);
-  if(ev.opp){}                                      // 對方得失分只存在這台手機
-  else if(i>=0) queue.splice(i,1);                  // 還沒送出：直接從佇列拿掉
+  if(i>=0) queue.splice(i,1);                  // 還沒送出：直接從佇列拿掉
   else queue.push({op:"undo",key:"u:"+id,id});      // 已送出：送撤銷
   ev.st="undone"; ev.undoneAt=Date.now();
   serverEvents=serverEvents.filter(e=>e.id!==id);
@@ -1386,7 +1401,9 @@ async function flush(){
     batch.forEach(op=>{
       if(!finished.has(op.key)) return;
       if(op.op==="score"){ const x=local.scores[op.s.match+"|"+op.s.set]; if(x&&x.key===op.key){ if(rej[op.key]) x.why=rej[op.key]; else delete local.scores[op.s.match+"|"+op.s.set]; if(!rej[op.key]&&boot){ boot.scores=(boot.scores||[]).filter(y=>!(y.match===op.s.match&&y.set===op.s.set)).concat([Object.assign({},x,{key:undefined})]); store.set(K("boot"),boot);} } }
-      if(op.op==="add"){ const ev=local.events[op.ev.id]; if(ev&&ev.st==="pending") ev.st=rej[op.key]?"rejected":"synced"; if(ev&&rej[op.key]) ev.why=rej[op.key]; }
+      if(op.op==="add"){ const ev=local.events[op.ev.id];
+        if(ev&&ev.opp&&rej[op.key]){ ev.st="local"; ev.why=rej[op.key]; }      // 對方得失分送不上去（例如後端還沒更新）：留在本機照樣算比分
+        else { if(ev&&ev.st==="pending") ev.st=rej[op.key]?"rejected":"synced"; if(ev&&rej[op.key]) ev.why=rej[op.key]; } }
     });
     queue=queue.filter(op=>!finished.has(op.key));
     syncState.lastOk=Date.now(); setOffline(false); saveLocal();
@@ -1407,7 +1424,7 @@ function renderSync(){
 $("syncBtn").addEventListener("click",()=>{ syncState.offline=false; flush(); if(currentTab==="stats") refreshStats(); });
 window.addEventListener("online",()=>{ syncState.offline=false; flush(); });
 window.addEventListener("offline",()=>setOffline(true));
-setInterval(()=>{ if(!auth||document.hidden) return; if(queue.length) flush(); if(Date.now()-lastBoot>BOOT_REFRESH_MS) refreshBoot(); if(currentTab==="stats"&&Date.now()-lastStats>STATS_REFRESH_MS) refreshStats(); }, SYNC_EVERY_MS);
+setInterval(()=>{ if(!auth||document.hidden) return; if(queue.length) flush(); if(Date.now()-lastBoot>BOOT_REFRESH_MS) refreshBoot(); if(Date.now()-lastStats>(currentTab==="stats"?STATS_REFRESH_MS:BOOT_REFRESH_MS)) refreshStats(); }, SYNC_EVERY_MS);
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden&&auth){ flush(); if(currentTab==="stats") refreshStats(); } });
 
 /* ====================== 場次 ====================== */
@@ -1478,30 +1495,39 @@ function renderPlayers(){
 const ckey = () => prefs.match+"|"+prefs.set;
 const ROT  = p => ({1:p[2],2:p[3],3:p[4],4:p[5],5:p[6],6:p[1]});    // 順時針輪轉一格（2 號位的人轉到 1 號位發球）
 const ROTB = p => ({1:p[6],2:p[1],3:p[2],4:p[3],5:p[4],6:p[5]});    // 退回一格
-function rally(match,set){
+/** 某一局的所有紀錄：伺服器上的（含別台手機記的）＋這台手機的；本機撤銷的不算 */
+function rallyEvents(match,set){
+  const map={};
+  serverEvents.forEach(e=>{ if(e.match===match&&Number(e.set)===set) map[e.id]=e; });
+  Object.values(local.events).forEach(e=>{ if(e.match!==match||e.set!==set) return;
+    if(e.st==="undone"||e.st==="rejected") delete map[e.id]; else map[e.id]=e; });
+  return Object.values(map);
+}
+/** ann：傳入物件時，替每一筆紀錄寫下 {us,them（這一球之後）, serve（這一球的發球方）, rot（第幾輪 1～6）, slot（P1～P6／板凳）} */
+function rally(match,set,ann){
   const c=local.court[match+"|"+set]||null;
-  let pos=null, serve=null, us=0, them=0, libOn=null; const seen=new Set(), libero=c&&c.libero||null;
+  let pos=null, serve=null, us=0, them=0, libOn=null, rot=0; const seen=new Set(), libero=c&&c.libero||null;
   const slotOf=id=>pos?+Object.keys(pos).find(k=>pos[k]===id)||0:0;
   const libCheck=()=>{ if(libOn){ const sl=slotOf(libero); if([2,3,4].includes(sl)){ pos[sl]=libOn.orig; libOn=null; } } };   // 自由球員轉到前排：自動換回原球員
   const items=[];
-  Object.values(local.events).forEach(e=>{
-    if(e.match!==match||e.set!==set||e.st==="undone"||e.st==="rejected") return;
-    if(e.opp) items.push({t:e.t,won:e.opp==="pt"});
-    else if(e.cat==="得分") items.push({t:e.t,won:true});
-    else if(e.cat==="失誤") items.push({t:e.t,won:false});          // 表現類不結束這一球
+  rallyEvents(match,set).forEach(e=>{
+    const won = e.opp ? e.opp==="pt" : e.cat==="得分" ? true : e.cat==="失誤" ? false : null;   // 表現類（null）不結束這一球
+    items.push({t:e.t||0,ev:e,won});
   });
   if(c&&c.lineup){ items.push({t:c.t0||0,type:"start"}); (c.log||[]).forEach(x=>items.push(x)); }
   items.sort((a,b)=>a.t-b.t || (a.type==="start"?-1:0));
   items.forEach(x=>{
     if(x.type==="start"){ pos=Object.assign({},c.lineup); serve=c.serve; Object.values(pos).forEach(id=>seen.add(id)); return; }
-    if(x.type==="rot"){ if(pos){ pos=x.dir<0?ROTB(pos):ROT(pos); libCheck(); } return; }
+    if(x.type==="rot"){ if(pos){ pos=x.dir<0?ROTB(pos):ROT(pos); rot+=x.dir<0?-1:1; libCheck(); } return; }
     if(x.type==="sub"){ if(pos){ const sl=Object.keys(pos).find(k=>pos[k]===x.out); if(sl){ pos[sl]=x.in; seen.add(x.in); } } return; }
     if(x.type==="libin"){ if(pos&&libero&&!libOn){ const sl=slotOf(x.for); if([5,6,1].includes(sl)){ pos[sl]=libero; libOn={orig:x.for}; seen.add(libero); } } return; }
     if(x.type==="libout"){ if(libOn){ const sl=slotOf(libero); if(sl) pos[sl]=libOn.orig; libOn=null; } return; }
-    if(x.won){ us++; if(pos&&serve==="them"){ pos=ROT(pos); libCheck(); } serve="us"; }      // 拿回發球權才輪轉
-    else { them++; serve="them"; }
+    const e=x.ev, info = ann ? {serve:serve||"", rot:pos?((rot%6)+6)%6+1:"", slot:pos&&e.player?(slotOf(e.player)?"P"+slotOf(e.player):"板凳"):""} : null;
+    if(x.won===true){ us++; if(pos&&serve==="them"){ pos=ROT(pos); rot++; libCheck(); } serve="us"; }      // 拿回發球權才輪轉
+    else if(x.won===false){ them++; serve="them"; }
+    if(info){ info.us=us; info.them=them; ann[e.id]=info; }
   });
-  return {pos,serve,us,them,seen:[...seen],libero,libOn};
+  return {pos,serve,us,them,rot:pos?((rot%6)+6)%6+1:0,seen:[...seen],libero,libOn};
 }
 function renderScore(){
   if(!auth||!prefs.match) return;
@@ -1515,8 +1541,9 @@ function renderScore(){
 }
 function addOpp(kind, said){
   if(!prefs.match) return;
-  const ev={id:uid(),t:Date.now(),match:prefs.match,set:prefs.set,team:curTeam(),opp:kind,st:"local",transcript:prefs.keepTx?(said||""):""};
-  local.events[ev.id]=ev; saveLocal(); renderScore(); renderRecent(); if(prefs.court) renderPlayers();
+  const ev={id:uid(),t:Date.now(),match:prefs.match,set:prefs.set,team:curTeam(),opp:kind,st:"pending",source:said?"voice":"tap",transcript:prefs.keepTx?(said||""):""};
+  local.events[ev.id]=ev; ev.sc=snapOf(ev); queue.push(oppOp(ev));
+  saveLocal(); renderScore(); renderRecent(); if(prefs.court) renderPlayers(); flush();
   if(navigator.vibrate) navigator.vibrate(20);
   showToast(kind==="pt"?"對方失誤：我方 +1":"對方得分：對方 +1", ev.id);
 }
@@ -1556,7 +1583,16 @@ function courtHtml(st){
 }
 function addCourtLog(x){
   const c=local.court[ckey()]; if(!c) return;
-  c.log=c.log||[]; c.log.push(Object.assign({t:Date.now()},x)); saveLocal(); renderScore(); renderPlayers();
+  c.log=c.log||[]; c.log.push(Object.assign({t:Date.now()},x)); queueCourt(ckey()); renderScore(); renderPlayers();
+}
+/** 站位送到伺服器（同一局只留最新一份在佇列） */
+function queueCourt(k){
+  const c=local.court[k]; if(!c) return;
+  c.upd=Date.now();
+  const [m,s]=k.split("|");
+  queue=queue.filter(q=>!(q.op==="court"&&q.k===k));
+  queue.push({op:"court",key:"c:"+k+":"+c.upd,k,c:{match:m,set:+s,lineup:c.lineup,serve:c.serve,libero:c.libero||"",t0:c.t0||0,log:c.log||[],upd:c.upd}});
+  saveLocal(); flush();
 }
 $("courtArea").addEventListener("click",e=>{
   if(e.target.closest("[data-goto]")) return show("team");
@@ -1630,7 +1666,7 @@ $("luOk").addEventListener("click",()=>{
   if(!lu.serve){ $("luMsg").textContent="請選這局由哪一方先發球"; return; }
   const k=ckey(), had=local.court[k];
   local.court[k]={lineup:Object.assign({},lu.slots),serve:lu.serve,libero:lu.libero||"",t0:Date.now(),log:[]};
-  saveLocal(); $("lineupDlg").close(); subMode=false; libMode=false; clearSel(); renderScore(); renderPlayers();
+  queueCourt(k); $("lineupDlg").close(); subMode=false; libMode=false; clearSel(); renderScore(); renderPlayers();
   showToast(had?"已重排先發":`第 ${prefs.set} 局先發排好了`);
 });
 
@@ -1639,7 +1675,7 @@ function openSetDlg(){
   if(!prefs.match) return;
   const saved=scoresOf(curTeam()).find(x=>x.match===prefs.match&&x.set===prefs.set), r=rally(prefs.match,prefs.set);
   $("setTitle").textContent=`第 ${prefs.set} 局結束`;
-  $("setNote").textContent = saved ? "這局已經存過比分，可以修改後再存一次。" : (r.us||r.them) ? "比分已依這台手機記的每一球帶入，可以直接修改。" : "這局沒有逐球記比分，請輸入最後比分。";
+  $("setNote").textContent = saved ? "這局已經存過比分，可以修改後再存一次。" : (r.us||r.them) ? "比分已依這一局記的每一球帶入（含隊友手機記的），可以直接修改。" : "這局沒有逐球記比分，請輸入最後比分。";
   $("scUs").value = saved ? saved.us : (r.us||r.them ? r.us : "");
   $("scThem").value = saved ? saved.them : (r.us||r.them ? r.them : "");
   $("scOk").textContent = saved ? "儲存" : (prefs.set<5 ? "儲存・下一局" : "儲存");
@@ -1746,7 +1782,7 @@ function renderRecent(){
   $("recentNote").textContent = list.length ? "只顯示這台手機記的" : "";
   $("recent").innerHTML = list.length ? list.map(e=>{
     if(e.opp) return `<li class="${e.st==="undone"?"undone":""}"><i class="dot" style="background:var(--muted)"></i>
-      <span class="txt">${e.opp==="pt"?"對方失誤":"對方得分"}<small>第 ${e.set} 局・${hhmm(e.t)}・只記比分</small></span>
+      <span class="txt">${e.opp==="pt"?"對方失誤":"對方得分"}<small>第 ${e.set} 局・${hhmm(e.t)}・比分</small></span>
       <span class="val ${e.opp==="pt"?"pt":"er"}" style="font-size:14px">${e.opp==="pt"?"我方 +1":"對方 +1"}</span>
       ${e.st==="undone"?`<small style="color:var(--muted)">已撤銷</small>`:`<button type="button" data-undo="${esc(e.id)}">撤銷</button>`}</li>`;
     const p=playerBy(e.player)||{name:"?"}, a=actionBy(e.action)||{name:e.action,cat:e.cat,value:e.value}, t=teamOf(e.team);
@@ -2036,14 +2072,13 @@ async function refreshStats(){
     const r=await api({action:"events",token:auth.token});
     if(!r.ok){ if(r.error==="auth") needAuth(); return; }
     serverEvents=r.events; store.set(K("server"),serverEvents); lastStats=Date.now(); setOffline(false);
-    // 伺服器已收到的就不再是待送
-    renderStats();
+    renderStats(); renderScore(); if(prefs.court) renderPlayers();
   }catch(e){ setOffline(true); }
 }
 function mergedEvents(){
   const map={}; serverEvents.forEach(e=>map[e.id]=e);
-  Object.values(local.events).forEach(e=>{ if(e.opp) return; if(e.st==="undone"||e.st==="rejected") delete map[e.id]; else if(!map[e.id]) map[e.id]=Object.assign({},e,{local:true}); });
-  return Object.values(map);
+  Object.values(local.events).forEach(e=>{ if(e.st==="undone"||e.st==="rejected") delete map[e.id]; else if(!map[e.id]) map[e.id]=Object.assign({},e,{local:true}); });
+  return Object.values(map).filter(e=>!e.opp);                 // 對方得失分只算比分，不列入隊員統計
 }
 function renderStats(){
   if(!auth||!boot) return;
@@ -2189,11 +2224,22 @@ function exportCsv(kind){
       .concat(acts.map(a=>r.by[a.code]||0)); });
     downloadCsv(`球員統計_${safe}.csv`,[head].concat(rows));
   } else {
-    const mm={}; ms.forEach(m=>mm[m.id]=m);
-    const sorted=evs.slice().sort((a,b)=>((mm[a.match]||{}).date||"").localeCompare((mm[b.match]||{}).date||"")||((mm[a.match]||{}).created||0)-((mm[b.match]||{}).created||0)||a.set-b.set||(a.t||0)-(b.t||0));
-    const rows=sorted.map(e=>{ const m=mm[e.match]||{}, p=playerBy(e.player)||{}, a=actionBy(e.action)||{name:e.action};
-      return [m.date||"",m.opponent||"",m.title||"",e.set,p.name||"",p.no||"",a.name,e.cat,e.cat==="表現"?0:(Number(e.value)||1)]; });
-    downloadCsv(`逐筆紀錄_${safe}.csv`,[["日期","對手","場次名稱","局","隊員","背號","動作","類別","分值"]].concat(rows));
+    // 依場次（舊→新）、局、時間重播，算出每一筆當下的比分與站位
+    const scope=ms.filter(m=>statsFilter==="all"||m.id===statsFilter).slice().sort((a,b)=>(a.date||"").localeCompare(b.date||"")||(a.created||0)-(b.created||0));
+    const rows=[];
+    scope.forEach(m=>{ for(let set=1;set<=5;set++){
+      if(statsSet!=="all"&&statsSet!==set) continue;
+      const list=rallyEvents(m.id,set); if(!list.length) continue;
+      const ann={}; rally(m.id,set,ann);
+      list.sort((a,b)=>(a.t||0)-(b.t||0)).forEach(e=>{
+        const x=ann[e.id]||{}, p=playerBy(e.player)||{}, a=actionBy(e.action)||{name:e.action};
+        const name=e.opp?(e.opp==="pt"?"對方失誤":"對方得分"):a.name, cat=e.opp?"對方":e.cat;
+        const val=e.opp?(e.opp==="pt"?1:-1):e.cat==="表現"?0:(e.cat==="失誤"?-1:1)*(Number(e.value)||1);
+        rows.push([m.date||"",m.opponent||"",m.title||"",set,e.t?hhmm(e.t):"",p.name||"",p.no||"",name,cat,val,
+          x.us==null?"":x.us,x.them==null?"":x.them,x.serve==="us"?"我方":x.serve==="them"?"對方":"",x.rot||"",x.slot||""]);
+      });
+    } });
+    downloadCsv(`逐筆紀錄_${safe}.csv`,[["日期","對手","場次名稱","局","時間","隊員","背號","動作","類別","我方得失","我方比分","對方比分","發球方","輪轉","站位"]].concat(rows));
   }
   showToast("已匯出 CSV");
 }
