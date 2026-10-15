@@ -9,7 +9,9 @@
 <meta name="theme-color" content="#E4EFF4">
 <title>混排球員數據</title>
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="icon" type="image/svg+xml" href="icons/logo.svg">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -84,7 +86,7 @@ main{flex:1}
 .site-head{background:transparent;color:var(--ink);padding-top:env(safe-area-inset-top,0px)}
 .site-head .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:10px}
 .brand{font-weight:500;font-size:18px;letter-spacing:.02em;display:flex;align-items:center;gap:8px;white-space:nowrap;text-decoration:none;color:inherit}
-.brand svg{opacity:.85}
+.brand .mark{width:32px;height:32px;flex:none;border-radius:9px;box-shadow:0 5px 12px -5px rgba(10,40,60,.55)}
 .head-r{display:flex;align-items:center;gap:8px;min-width:0}
 .who{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--glass-bd);border-radius:999px;padding:3px 4px 3px 12px;font-weight:500;font-size:13px;max-width:46vw;background:var(--glass)}
 .who span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -95,7 +97,7 @@ main{flex:1}
 .theme-btn .i-moon{display:none}
 .is-dark .theme-btn .knob{transform:translateX(26px)}
 .is-dark .theme-btn .i-sun{display:none}.is-dark .theme-btn .i-moon{display:block}
-@media (max-width:400px){.brand{font-size:16px}.brand svg{display:none}}
+@media (max-width:400px){.brand{font-size:16px}.site-head:has(#who:not([hidden])) .brand-txt{display:none}}
 
 /* ===== 主視覺（登入頁） ===== */
 .hero{position:relative;overflow:hidden}
@@ -491,18 +493,72 @@ table.stand{width:100%;border-collapse:separate;border-spacing:0;background:var(
 .foot-row button{border:1px solid var(--glass-bd);background:var(--glass);color:inherit;border-radius:999px;font-weight:500;font-size:13px;padding:4px 14px;cursor:pointer}
 .is-app footer{display:none}
 footer{border-top:1px solid var(--line);background:transparent;color:var(--muted);font-weight:400;padding:18px 0;font-size:12px;letter-spacing:.02em}
+
+/* ===== Logo、說明 ===== */
+.logo-defs{position:absolute;width:0;height:0;overflow:hidden}
+.help-btn{width:34px;height:34px;flex:none;border-radius:50%;border:1px solid var(--glass-bd);background:var(--glass);color:var(--ink);cursor:pointer;display:grid;place-items:center;box-shadow:var(--shadow-s);padding:0;-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.hero-row{display:flex;align-items:center;gap:16px}
+.hero-logo{width:68px;height:68px;flex:none;border-radius:19px;box-shadow:0 14px 28px -12px rgba(10,40,60,.6)}
+@media (max-width:400px){.hero-logo{width:56px;height:56px;border-radius:16px}}
+.install .btns{display:flex;gap:8px;flex:none}
+dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(100dvh - 24px);padding:0;overflow:auto;overscroll-behavior:contain}
+.help-top{position:sticky;top:0;z-index:2;background:var(--glass-hi);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:16px 18px 10px}
+.help-top .ttl{display:flex;align-items:center;gap:12px}
+.help-top .ttl svg{width:38px;height:38px;flex:none;border-radius:11px}
+.help-top h3{flex:1;margin:0;font-size:21px}
+.help-top h3 small{display:block;font-size:12px;color:var(--muted);font-weight:400;letter-spacing:.04em}
+.help-top .x{border:1px solid var(--glass-bd);background:var(--glass-2);color:var(--ink);border-radius:50%;width:38px;height:38px;font-size:19px;cursor:pointer;flex:none}
+.help-nav{display:flex;gap:6px;overflow-x:auto;margin:12px -18px 0;padding:0 18px 4px;scrollbar-width:none}
+.help-nav::-webkit-scrollbar{display:none}
+.help-nav button{flex:none;border:1px solid var(--glass-bd);border-radius:999px;background:var(--glass-2);color:var(--ink);font-weight:500;font-size:13px;padding:5px 14px;cursor:pointer;white-space:nowrap}
+.help-nav button.on{background:var(--solid);color:var(--solid-fg);border-color:transparent;box-shadow:var(--shadow-s)}
+.help-body{padding:4px 18px 28px}
+.hsec{scroll-margin-top:118px;padding:20px 0 6px;border-bottom:1px solid var(--line)}
+.hsec:last-child{border-bottom:0}
+.hsec h4{margin:0 0 8px;font-size:19px;font-weight:400;display:flex;align-items:center;gap:10px}
+.hsec h4 i{font-style:normal;width:30px;height:30px;border-radius:10px;background:var(--accent);color:var(--accent-fg);display:grid;place-items:center;font-size:15px;flex:none}
+.hsec p,.hsec li{font-size:14px;line-height:1.7;margin:6px 0}
+.hsec ul{padding-left:1.25em;margin:6px 0}
+.hsec .guide{margin-top:10px}
+.say{display:inline-block;background:var(--glass-2);border:1px solid var(--glass-bd);border-radius:999px;padding:0 10px;font-size:13px;line-height:1.7;white-space:nowrap;font-weight:500}
+.htbl{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0;background:var(--glass-2);border-radius:var(--r-sm);overflow:hidden}
+.htbl th,.htbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55}
+.htbl tr:last-child td{border-bottom:0}
+.htbl th{color:var(--muted);font-weight:500;font-size:12px;white-space:nowrap}
+.htbl .y{color:var(--ok);font-weight:500}.htbl .n0{color:var(--muted)}
+.dot-i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.os-seg{margin:10px 0 4px}
+.os-seg button{min-width:0;padding:0 14px}
+.inst-state{margin:10px 0 0;font-size:13px}
+.inst-tip{font-size:13px;color:var(--muted);margin:10px 0 0;padding:10px 12px;border-radius:var(--r-sm);background:var(--glass-2);border:1px solid var(--line)}
+.inst-tip b{color:var(--ink);font-weight:500}
+.kbd{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--glass-bd);background:var(--glass);border-radius:8px;padding:0 7px;font-size:12px;font-weight:500;line-height:1.8;white-space:nowrap;vertical-align:1px}
+.help-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.help-links .btn{flex:1;min-width:130px;min-height:42px;font-size:14px}
 </style>
 </head>
 <body>
+<!-- Logo：霧藍底＋白色排球＋數據長條（與 icons/logo.svg 相同） -->
+<svg class="logo-defs" aria-hidden="true" focusable="false"><defs>
+  <linearGradient id="lgBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4C9FC0"/><stop offset=".5" stop-color="#1D5E7D"/><stop offset="1" stop-color="#0B2B3E"/></linearGradient>
+  <radialGradient id="lgGlow" cx=".12" cy=".05" r=".7"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".55"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+  <linearGradient id="lgBall" x1=".2" y1=".1" x2=".85" y2=".95"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#CFE6F0"/></linearGradient>
+  <linearGradient id="lgGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".28"/><stop offset="1" stop-color="#FFFFFF" stop-opacity=".04"/></linearGradient>
+  <symbol id="vsLogo" viewBox="0 0 512 512">
+    <rect width="512" height="512" rx="116" fill="url(#lgBg)"/><rect width="512" height="512" rx="116" fill="url(#lgGlow)"/>
+    <circle cx="232" cy="232" r="148" fill="url(#lgBall)"/>
+    <g fill="none" stroke="#1B5C79" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" transform="translate(52 52) scale(15)"><path d="M11.1 7.1a16.55 16.55 0 0 1 10.9 4"/><path d="M12 12a12.6 12.6 0 0 1-8.7 5"/><path d="M16.8 13.6a16.55 16.55 0 0 1-9 7.5"/><path d="M20.7 17a12.8 12.8 0 0 0-8.7-5 13.3 13.3 0 0 1 0-10"/><path d="M6.3 3.8a16.55 16.55 0 0 0 1.9 11.5"/></g>
+    <rect x="300" y="300" width="160" height="160" rx="46" fill="#0E3A51" fill-opacity=".72"/><rect x="300" y="300" width="160" height="160" rx="46" fill="url(#lgGlass)" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="3"/>
+    <rect x="330" y="384" width="24" height="46" rx="12" fill="#94D9F0"/><rect x="368" y="358" width="24" height="72" rx="12" fill="#CDEFFA"/><rect x="406" y="330" width="24" height="100" rx="12" fill="#FFFFFF"/>
+  </symbol>
+</defs></svg>
 
 <header class="site-head">
   <div class="wrap">
-    <a class="brand" href="#">
-      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11.1 7.1a16.55 16.55 0 0 1 10.9 4"/><path d="M12 12a12.6 12.6 0 0 1-8.7 5"/><path d="M16.8 13.6a16.55 16.55 0 0 1-9 7.5"/><path d="M20.7 17a12.8 12.8 0 0 0-8.7-5 13.3 13.3 0 0 1 0-10"/><path d="M6.3 3.8a16.55 16.55 0 0 0 1.9 11.5"/><circle cx="12" cy="12" r="10"/></svg>
-      混排球員數據
-    </a>
+    <a class="brand" href="#"><svg class="mark" viewBox="0 0 512 512" aria-hidden="true"><use href="#vsLogo"/></svg><span class="brand-txt">混排球員數據</span></a>
     <div class="head-r">
       <span class="who" id="who" hidden><span id="whoName"></span><button type="button" id="logoutBtn">登出</button></span>
+      <button type="button" class="help-btn" id="helpBtn" aria-label="使用說明" title="使用說明"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 9a3 3 0 0 1 5.8 1c0 2-3 2.6-3 4.5"/><circle cx="12" cy="18.3" r=".6" fill="currentColor"/></svg></button>
       <button type="button" class="theme-btn" id="themeBtn" role="switch" aria-checked="false" aria-label="深色模式" title="切換深淺色">
         <span class="knob">
           <svg class="i-sun" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="currentColor"/><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></g></svg>
@@ -534,7 +590,7 @@ footer{border-top:1px solid var(--line);background:transparent;color:var(--muted
   <div class="hero">
     <div class="wrap">
       <span class="edition" aria-hidden="true">STATS</span>
-      <h1>球員得失分紀錄</h1>
+      <div class="hero-row"><svg class="hero-logo" viewBox="0 0 512 512" role="img" aria-label="混排球員數據"><use href="#vsLogo"/></svg><h1>球員得失分紀錄</h1></div>
       <p class="tagline">TAP · TALK · TRACK</p>
     </div>
   </div>
@@ -565,9 +621,10 @@ footer{border-top:1px solid var(--line);background:transparent;color:var(--muted
       <div class="banner install" id="installBox" hidden>
         <img src="icons/icon-192.png" alt="">
         <p id="installText"><b>裝成 App</b>：放在主畫面、全螢幕開啟，沒網路也打得開。</p>
-        <button class="btn" type="button" id="installBtn" hidden>安裝</button>
+        <span class="btns"><button class="btn ghost" type="button" id="installHow">教學</button><button class="btn" type="button" id="installBtn" hidden>安裝</button></span>
       </div>
-      <div class="banner warn" id="lineWarn" hidden>你正在用 LINE 內建瀏覽器，語音輸入無法使用。請點右上角「⋯」→「用預設瀏覽器開啟」。</div>
+      <div class="banner warn" id="lineWarn" hidden>你正在用 LINE 內建瀏覽器，語音輸入和安裝成 App 都無法使用。請點右上角「⋯」→「用預設瀏覽器開啟」。</div>
+      <p class="note" style="text-align:center;margin-top:14px">第一次用？<button type="button" class="linkish" data-help="h-quick" style="border:0;background:none;color:var(--ink);font-weight:500;text-decoration:underline;cursor:pointer;padding:0;font-size:13px">看 1 分鐘上手說明</button></p>
     </div>
   </main>
 </div>
@@ -724,6 +781,10 @@ footer{border-top:1px solid var(--line);background:transparent;color:var(--muted
         <p class="note" id="tryNote" style="margin:14px 4px 0">賽前建議每人按一次「🎙 試說」：念名字或平常叫的綽號，看手機聽成什麼。認不出來時，按「＋ 加為綽號」就能改善。</p>
         <div class="box" style="margin-top:10px;padding:6px 12px"><ul class="plist" id="plist"></ul></div>
       </div>
+      <div class="box" style="margin-top:20px">
+        <div class="sec-h" style="margin-top:0"><h3>說明與安裝</h3><small>隨時可按右上角 ? 開啟</small></div>
+        <div class="help-links"><button class="btn ghost" type="button" data-help="h-quick">使用說明</button><button class="btn ghost" type="button" data-help="h-install">安裝到手機</button><button class="btn ghost" type="button" data-help="h-share">邀請隊友</button></div>
+      </div>
     </section>
   </main>
 </div>
@@ -815,13 +876,193 @@ footer{border-top:1px solid var(--line);background:transparent;color:var(--muted
   </form>
 </dialog>
 
+<!-- ============ 使用說明（右上角 ? 開啟） ============ -->
+<dialog id="helpDlg" class="help" aria-labelledby="helpTitle">
+  <div class="help-top">
+    <div class="ttl">
+      <svg viewBox="0 0 512 512" aria-hidden="true"><use href="#vsLogo"/></svg>
+      <h3 id="helpTitle">使用說明<small>混排球員數據・球員得失分紀錄</small></h3>
+      <button type="button" class="x" id="helpClose" aria-label="關閉說明">×</button>
+    </div>
+    <nav class="help-nav" aria-label="說明章節">
+      <button type="button" data-go="h-quick">快速上手</button>
+      <button type="button" data-go="h-install">安裝到手機</button>
+      <button type="button" data-go="h-record">記錄</button>
+      <button type="button" data-go="h-voice">語音</button>
+      <button type="button" data-go="h-score">比分與局</button>
+      <button type="button" data-go="h-court">站位輪轉</button>
+      <button type="button" data-go="h-stats">數據</button>
+      <button type="button" data-go="h-codes">代碼與權限</button>
+      <button type="button" data-go="h-share">邀請隊友</button>
+      <button type="button" data-go="h-sync">離線與同步</button>
+      <button type="button" data-go="h-faq">常見問題</button>
+    </nav>
+  </div>
+  <div class="help-body">
+
+    <section class="hsec" id="h-quick">
+      <h4><i>1</i>快速上手</h4>
+      <p>每一隊派一個人用手機記錄自己隊的得分、失誤，比賽後就有每位隊員的數據。四步驟開始：</p>
+      <ol class="guide">
+        <li><b>建立隊伍</b><span>在登入頁輸入隊名（例如「向日葵班」）、選代表色，按「建立隊伍」。</span></li>
+        <li><b>收好兩組代碼</b><span><b>記錄碼</b>傳給隊友一起記錄；<b>管理碼</b>自己保管，用來改名單、刪場次。</span></li>
+        <li><b>新增隊員</b><span>到「隊伍」分頁輸入姓名、背號、位置（例如 野原新之助・#5・砲位），綽號可填「小新」。賽前每人按一次「🎙 試說」。</span></li>
+        <li><b>新增場次開始記</b><span>回到「紀錄」分頁按「＋」，填日期和對手（例如「玫瑰班」），就可以點按或用語音記錄。</span></li>
+      </ol>
+      <p class="inst-tip"><b>建議先安裝成 App</b>：放在手機主畫面，全螢幕、開得快，沒網路也打得開。<button type="button" data-go="h-install" class="kbd" style="cursor:pointer">看安裝步驟 →</button></p>
+    </section>
+
+    <section class="hsec" id="h-install">
+      <h4><i>2</i>安裝到手機主畫面</h4>
+      <p>這是「網頁 App」：不用上架、不用到 App Store／Google Play 下載，從瀏覽器加到主畫面就和一般 App 一樣，點圖示直接全螢幕開啟。</p>
+      <div class="banner inst-state" id="instState"></div>
+      <button type="button" class="btn" id="helpInstallBtn" style="width:100%;margin-top:10px" hidden>立即安裝</button>
+      <div class="seg small os-seg" id="osSeg" role="group" aria-label="手機系統">
+        <button type="button" data-os="ios">iPhone／iPad</button><button type="button" data-os="android">Android</button>
+      </div>
+
+      <div id="osIos">
+        <ol class="guide">
+          <li><b>用 Safari 打開網址</b><span>從 LINE 點開的話，先點右下角「⋯」或分享鈕 →「用 Safari 開啟」。LINE 內建瀏覽器無法安裝。</span></li>
+          <li><b>點「分享」<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" style="vertical-align:-2px"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M6 11H4.5v10h15V11H18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></b><span>iPhone 在畫面最下方的工具列（看不到就往上滑一下讓工具列出現）；iPad 在網址列右側。</span></li>
+          <li><b>選「加入主畫面」</b><span>在分享選單往下滑就會看到。找不到時點最下方「編輯動作」，把「加入主畫面」加進來。</span></li>
+          <li><b>按右上角「新增」</b><span>名稱會自動帶入「球員數據」，可以改。主畫面就會出現霧藍排球圖示。</span></li>
+        </ol>
+        <p class="inst-tip"><b>用 Chrome 或 Edge？</b>iOS 16.4 以上也可以：點網址列旁的分享鈕 →「加入主畫面」。比較舊的 iOS 只能用 Safari。<br><b>第一次語音</b>：按住說話時會詢問麥克風，請按「允許」。主畫面 App 和 Safari 的登入是分開的，第一次打開 App 要再輸入一次代碼。</p>
+      </div>
+
+      <div id="osAndroid" hidden>
+        <ol class="guide">
+          <li><b>用 Chrome 打開網址</b><span>從 LINE 點開的話，先點右上角「⋮」→「用預設瀏覽器開啟」。</span></li>
+          <li><b>按「安裝」</b><span>登入頁下方出現「安裝」按鈕時直接按；或上面的「立即安裝」。</span></li>
+          <li><b>沒有按鈕時：右上角 <span class="kbd">⋮</span></b><span>選「安裝應用程式」或「加到主畫面」→「安裝」。</span></li>
+          <li><b>到主畫面找圖示</b><span>有些手機會放在 App 抽屜最後面，可以長按拖到主畫面。</span></li>
+        </ol>
+        <p class="inst-tip"><b>Samsung 網際網路</b>：點下方 <span class="kbd">≡</span> →「新增頁面至」→「主螢幕」。<br><b>第一次語音</b>：按住說話時會詢問麥克風，請按「允許」；拒絕過的話，到 Chrome 網址列左邊的 ⓘ →「權限」打開麥克風。</p>
+      </div>
+      <p class="note">網址：<b id="helpUrl"></b> <button type="button" class="kbd" id="helpCopyUrl" style="cursor:pointer">複製</button></p>
+    </section>
+
+    <section class="hsec" id="h-record">
+      <h4><i>3</i>記錄方式</h4>
+      <p>先在上方選好<b>場次</b>和<b>局數</b>，再用下面兩種方式之一：</p>
+      <ul>
+        <li><b>點兩下</b>：先點隊員、再點動作（順序反過來也可以），立刻記一筆。</li>
+        <li><b>語音</b>：按住大按鈕說話、放開送出，例如 <span class="say">小新 殺球</span> <span class="say">5 號 發球失誤</span>。</li>
+      </ul>
+      <p>右上角「名字／背號」切換按鈕顯示名字或背號。記錯了按畫面下方的「撤銷」，或在「最近紀錄」裡撤銷。</p>
+      <table class="htbl">
+        <tr><th>類別</th><th>動作</th><th>計分</th></tr>
+        <tr><td><i class="dot-i" style="background:var(--pt)"></i>得分</td><td>殺球、攔網、發球、吊球</td><td>＋1</td></tr>
+        <tr><td><i class="dot-i" style="background:var(--er)"></i>失誤</td><td>發球失誤、攻擊失誤、觸網、接發失誤、違例</td><td>－1</td></tr>
+        <tr><td><i class="dot-i" style="background:var(--pf)"></i>表現</td><td>接發未到位、舉球未到位、機會球沒到位、救球成功</td><td>不計分，只統計次數</td></tr>
+      </table>
+    </section>
+
+    <section class="hsec" id="h-voice">
+      <h4><i>4</i>語音小技巧</h4>
+      <ul>
+        <li>說法是「<b>誰 ＋ 動作</b>」：<span class="say">風間 攔網</span> <span class="say">妮妮 接發未到位</span>。用背號模式時說 <span class="say">8 號 吊球</span>。</li>
+        <li>放開後會出現確認卡片，<b>3 秒後自動記錄</b>；說錯就按「取消」，或馬上說 <span class="say">取消</span>。</li>
+        <li>對方的得失分只記比分：<span class="say">對方失誤</span> <span class="say">對方得分</span>。</li>
+        <li>聽不出是誰時會列出候選人，點選後勾「記住這個說法」，下次就認得。</li>
+        <li>賽前到「隊伍」分頁每人按「🎙 試說」，念平常叫的綽號（例如「小新」「阿呆」），認錯的字可以一鍵加為綽號。</li>
+        <li>語音辨識需要網路；LINE 內建瀏覽器不能用語音。原句預設不保存（隊伍頁可開啟）。</li>
+      </ul>
+    </section>
+
+    <section class="hsec" id="h-score">
+      <h4><i>5</i>比分與局</h4>
+      <ul>
+        <li>比分板依每一筆紀錄自動算：我方得分、對方失誤＝我方 +1；我方失誤、對方得分＝對方 +1。表現類不影響比分。</li>
+        <li>黃點表示目前哪一方發球。</li>
+        <li>一局打完按「<b>結束第 N 局</b>」確認比分（可修改），存好會自動切到下一局。</li>
+        <li>三局兩勝已分出勝負時不會自動跳下一局；要打第 4、5 局直接點局數。</li>
+      </ul>
+    </section>
+
+    <section class="hsec" id="h-court">
+      <h4><i>6</i>站位輪轉（選用）</h4>
+      <p>想知道每個人在哪個位置得失分，可以打開比分板下的「站位輪轉」：</p>
+      <ol class="guide">
+        <li><b>排先發</b><span>點位置再點隊員排滿 6 人，可選自由球員，再選哪一方先發球。下一局預設沿用。</span></li>
+        <li><b>點場上的隊員 → 選動作</b><span>動作會依站位縮減（後排沒有攔網、只有發球的人有發球），需要時按「顯示全部動作」。</span></li>
+        <li><b>自動輪轉</b><span>我方從對方手上拿回發球權時自動轉一格；也可以手動「輪轉／退回」、「換人」、「自由上場／下場」。</span></li>
+      </ol>
+      <p class="note">站位只存在記錄的那台手機；撤銷紀錄時比分和站位會一起退回。</p>
+    </section>
+
+    <section class="hsec" id="h-stats">
+      <h4><i>7</i>看數據</h4>
+      <ul>
+        <li>上方可選「全部場次」或單一場，再選「整場」或某一局。</li>
+        <li><b>淨值</b>＝得分－失誤；<b>效率</b>＝淨值 ÷（得分＋失誤）。例如小新得 6 分、失誤 2 次：淨值 +4、效率 +50%。</li>
+        <li>點表格裡的隊員可以看動作細項、上場局勝率與場勝率。</li>
+        <li>「歷史趨勢」顯示每場得分／失誤折線與每場平均，可切換全隊或個人。</li>
+        <li>「匯出 CSV」可以用 Excel、Numbers、Google 試算表開啟。</li>
+        <li>用管理碼登入時，選單一場次可以「刪除這一場」（不再列入統計，試算表仍保留原始資料）。</li>
+      </ul>
+    </section>
+
+    <section class="hsec" id="h-codes">
+      <h4><i>8</i>代碼與權限</h4>
+      <table class="htbl">
+        <tr><th></th><th>記錄碼<br>（給隊友）</th><th>管理碼<br>（自己保管）</th></tr>
+        <tr><td>記錄、撤銷、結束一局</td><td class="y">✓</td><td class="y">✓</td></tr>
+        <tr><td>看數據、匯出 CSV</td><td class="y">✓</td><td class="y">✓</td></tr>
+        <tr><td>試說、幫隊員加綽號</td><td class="y">✓</td><td class="y">✓</td></tr>
+        <tr><td>改隊名、新增／編輯隊員</td><td class="n0">—</td><td class="y">✓</td></tr>
+        <tr><td>刪除場次、重設代碼</td><td class="n0">—</td><td class="y">✓</td></tr>
+      </table>
+      <ul>
+        <li>代碼是 8 碼英數，大小寫、空格都沒關係。每隊只看得到自己的資料。</li>
+        <li>代碼外流時到「隊伍」分頁按「重設」，舊代碼和用它登入的手機會立刻失效。</li>
+        <li>同一台手機連續輸錯 5 次會暫停 10 分鐘。</li>
+      </ul>
+    </section>
+
+    <section class="hsec" id="h-share">
+      <h4><i>9</i>邀請隊友一起記</h4>
+      <ol class="guide">
+        <li><b>到「隊伍」分頁按「分享」</b><span>會把網址和記錄碼一起傳出去（LINE、訊息都可以）。</span></li>
+        <li><b>隊友打開網址 → 輸入記錄碼</b><span>建議請隊友也先安裝成 App。</span></li>
+        <li><b>分工記錄</b><span>例如正男記前排、妮妮記後排，大家的紀錄會合併到同一份數據。</span></li>
+      </ol>
+      <button type="button" class="btn ghost" id="helpShare" style="width:100%;margin-top:6px">分享網址與記錄碼</button>
+    </section>
+
+    <section class="hsec" id="h-sync">
+      <h4><i>10</i>離線與同步</h4>
+      <p>右上角分頁列的小圓點是同步狀態，點一下可立即同步：</p>
+      <table class="htbl">
+        <tr><td><i class="dot-i" style="background:var(--ok)"></i>已同步</td><td>紀錄都已送到伺服器。</td></tr>
+        <tr><td><i class="dot-i" style="background:#E9A23B"></i>待送 N 筆</td><td>正在送出，或稍後自動重試。</td></tr>
+        <tr><td><i class="dot-i" style="background:var(--er)"></i>離線</td><td>先存在手機裡，恢復網路後自動補送，不會遺失。</td></tr>
+      </table>
+      <p class="note">還有待送資料時不要清除瀏覽器資料或登出。</p>
+    </section>
+
+    <section class="hsec" id="h-faq">
+      <h4><i>11</i>常見問題</h4>
+      <ul>
+        <li><b>按住說話沒反應？</b>確認不是在 LINE 裡開啟、已允許麥克風、手機有網路。iPhone 主畫面 App 若無法使用語音，可改用 Safari 開同一個網址（用同一組代碼登入），或改用點按。</li>
+        <li><b>換手機可以接著記嗎？</b>可以，用同一組代碼登入，紀錄和比分都在。但站位輪轉的排先發只在原本那台手機。</li>
+        <li><b>跳出「需要重新登入」？</b>代碼被重設或登入超過 24 小時，重新輸入代碼即可；沒送出的紀錄會自動補送。</li>
+        <li><b>網站更新了但畫面沒變？</b>把 App 完全關掉再開一次；還是舊的就關掉後再開第二次。</li>
+        <li><b>要怎麼移除？</b>長按主畫面圖示 →「移除 App」或「解除安裝」，伺服器上的資料不受影響。</li>
+      </ul>
+    </section>
+
+  </div>
+</dialog>
+
 <dialog id="authDlg">
   <h3>需要重新登入</h3>
   <p class="note">代碼可能被主辦更換或登入已過期。尚未送出的紀錄會保留在這台手機，重新登入後自動補送。</p>
   <div class="acts"><button class="btn" type="button" id="reloginBtn">重新登入</button></div>
 </dialog>
 
-<footer><div class="wrap foot-row"><span>© 2026 你混哪？我混排！・球員得失分紀錄</span><button type="button" id="footInstall" hidden>📲 安裝成 App</button></div></footer>
+<footer><div class="wrap foot-row"><span>© 2026 你混哪？我混排！・球員得失分紀錄</span><span style="display:flex;gap:8px"><button type="button" data-help="h-quick">使用說明</button><button type="button" id="footInstall" data-help="h-install">📲 安裝成 App</button></span></div></footer>
 
 <script>
 (function(){
@@ -2148,28 +2389,80 @@ tabs.forEach((t,i)=>{ t.addEventListener("click",()=>show(t.getAttribute("aria-c
 const standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
 const inLine = /\bLine\//i.test(navigator.userAgent);
+const isAndroid = /Android/i.test(navigator.userAgent);
+const isSamsung = /SamsungBrowser/i.test(navigator.userAgent);
+const iosOther = isIOS && /CriOS|FxiOS|EdgiOS|OPiOS/.test(navigator.userAgent);
+const SHARE_SVG = '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" style="vertical-align:-2px"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M6 11H4.5v10h15V11H18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 document.documentElement.classList.toggle("is-app", standalone);
 let deferredPrompt=null;
 function showInstall(){
-  if(standalone || inLine) return;
-  if(deferredPrompt){
-    $("installBox").hidden=false; $("installBtn").hidden=false; $("footInstall").hidden=false;
-    $("installText").innerHTML="<b>裝成 App</b>：放在主畫面、全螢幕開啟，沒網路也打得開。";
-  } else if(isIOS){
-    $("installBox").hidden=false; $("installBtn").hidden=true; $("footInstall").hidden=true;
-    $("installText").innerHTML="<b>裝成 App</b>：用 Safari 開啟 → 點下方「分享」<svg aria-hidden=\"true\" width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" style=\"vertical-align:-2px\"><path d=\"M12 3v12M7.5 7.5 12 3l4.5 4.5M6 11H4.5v10h15V11H18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg> → 往下滑找「加入主畫面」。";
-  }
+  if(standalone) return;
+  $("installBox").hidden=false;
+  $("installBtn").hidden=!deferredPrompt;
+  $("installText").innerHTML = deferredPrompt ? "<b>裝成 App</b>：放在主畫面、全螢幕開啟，沒網路也打得開。"
+    : isIOS ? "<b>裝成 App</b>：用 Safari 開啟 → 點「分享」"+SHARE_SVG+" → 「加入主畫面」。"
+    : "<b>裝成 App</b>：用 Chrome 開啟 → 右上角 ⋮ →「加到主畫面」或「安裝應用程式」。";
+  renderInstallHelp();
 }
 async function doInstall(){
   if(!deferredPrompt) return;
   deferredPrompt.prompt();
   try{ await deferredPrompt.userChoice; }catch(e){}
-  deferredPrompt=null; $("installBox").hidden=true; $("footInstall").hidden=true;
+  deferredPrompt=null; showInstall();
 }
 window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferredPrompt=e; showInstall(); });
-window.addEventListener("appinstalled",()=>{ deferredPrompt=null; $("installBox").hidden=true; $("footInstall").hidden=true; });
+window.addEventListener("appinstalled",()=>{ deferredPrompt=null; $("installBox").hidden=true; renderInstallHelp(); showToast("已安裝！到主畫面找霧藍排球圖示"); });
 $("installBtn").addEventListener("click",doInstall);
-$("footInstall").addEventListener("click",doInstall);
+$("footInstall").addEventListener("click",e=>{ if(deferredPrompt){ e.stopPropagation(); doInstall(); } });
+
+/* ====================== 使用說明（右上角 ?） ====================== */
+let helpOS = isIOS ? "ios" : "android";
+function renderInstallHelp(){
+  if(!$("helpDlg")) return;
+  document.querySelectorAll("#osSeg [data-os]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.os===helpOS));
+  $("osIos").hidden=helpOS!=="ios"; $("osAndroid").hidden=helpOS!=="android";
+  $("helpInstallBtn").hidden=!deferredPrompt||standalone;
+  let msg, warn=false;
+  if(standalone) msg="✓ 你現在就是用 App 模式開啟的，不用再安裝。";
+  else if(inLine){ msg="你正在用 LINE 內建瀏覽器，無法安裝。請先點「⋯」→「用預設瀏覽器開啟」（iPhone 選 Safari），再照下面步驟做。"; warn=true; }
+  else if(deferredPrompt) msg="這支手機可以一鍵安裝：按下面的「立即安裝」。";
+  else if(iosOther) msg="你在 iPhone 上用的不是 Safari：建議改用 Safari 開啟（iOS 16.4 以上的 Chrome／Edge 也可以從分享選單加入）。";
+  else if(isIOS) msg="偵測到 iPhone／iPad，請照下面的步驟。";
+  else if(isAndroid) msg=isSamsung?"偵測到 Samsung 網際網路，請看下方的 Samsung 說明。":"偵測到 Android，請照下面的步驟。";
+  else msg="你現在用的是電腦：請用手機打開下方網址，再照步驟安裝。";
+  const st=$("instState"); st.className="banner inst-state"+(warn?" warn":""); st.textContent=msg;
+}
+function markHelpNav(){
+  const d=$("helpDlg"), top=d.getBoundingClientRect().top; let cur="h-quick";
+  d.querySelectorAll(".hsec").forEach(x=>{ if(x.getBoundingClientRect().top-top<150) cur=x.id; });
+  if(d.scrollTop+d.clientHeight>=d.scrollHeight-4) cur=d.querySelector(".hsec:last-child").id;
+  d.querySelectorAll(".help-nav [data-go]").forEach(b=>{ const on=b.dataset.go===cur; if(on&&!b.classList.contains("on")) b.scrollIntoView({block:"nearest",inline:"center"}); b.classList.toggle("on",on); });
+}
+function openHelp(sec){
+  const d=$("helpDlg"); closeActSheet(); renderInstallHelp(); $("helpUrl").textContent=shareUrl();
+  $("helpShare").textContent = auth&&boot&&boot.recCode ? "分享網址與記錄碼" : "分享網址";
+  if(!d.open) d.showModal();
+  requestAnimationFrame(()=>{ const el=sec&&$(sec); if(el) el.scrollIntoView({block:"start"}); else d.scrollTop=0; markHelpNav(); });
+}
+$("helpBtn").addEventListener("click",()=>openHelp());
+$("helpClose").addEventListener("click",()=>$("helpDlg").close());
+$("helpDlg").addEventListener("click",e=>{
+  if(e.target===$("helpDlg")) return $("helpDlg").close();       // 點背景關閉
+  const g=e.target.closest("[data-go]"); if(g){ const el=$(g.dataset.go); if(el) el.scrollIntoView({block:"start",behavior:"smooth"}); }
+});
+$("helpDlg").addEventListener("scroll",()=>requestAnimationFrame(markHelpNav),{passive:true});
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-help]"); if(b) openHelp(b.dataset.help); });
+$("installHow").addEventListener("click",()=>openHelp("h-install"));
+$("osSeg").addEventListener("click",e=>{ const b=e.target.closest("[data-os]"); if(!b) return; helpOS=b.dataset.os; renderInstallHelp(); });
+$("helpInstallBtn").addEventListener("click",doInstall);
+$("helpCopyUrl").addEventListener("click",()=>copyText(shareUrl()));
+$("helpShare").addEventListener("click",async ()=>{
+  if(auth&&boot&&boot.recCode){ const t=teamOf(auth.scope); return shareCode(t.name,boot.recCode); }
+  const text=`一起用「混排球員數據」記錄球員得失分：${shareUrl()}`;
+  if(navigator.share){ try{ await navigator.share({title:"混排球員數據",text}); return; }catch(err){ if(err&&err.name==="AbortError") return; } }
+  copyText(text);
+});
+
 showInstall();
 if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
@@ -2178,6 +2471,7 @@ if("serviceWorker" in navigator && /^https?:$/.test(location.protocol)){
 /* ====================== 開始 ====================== */
 if(auth && auth.token){ enterApp(false).then(()=>{ if(location.hash==="#stats"||location.hash==="#team") show(location.hash.slice(1)); }); }
 else showLogin();
+if(location.hash==="#help") openHelp();
 
 })();
 </script>
