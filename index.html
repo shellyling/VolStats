@@ -80,9 +80,9 @@ button{font:inherit;color:inherit}
 .wrap{max-width:760px;margin:0 auto;padding:0 16px}
 main{flex:1}
 
-/* 毛玻璃底 */
-.box,.stat-tile,.tabs,dialog,.card,.voice,.seg,.who,.theme-btn{
-  -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%)}
+/* 毛玻璃底（v15 省電）：背景是平滑漸層，卡片底下的模糊看不出差別，卻會讓手機 GPU 每一幀重算；
+   只保留在「下面有內容捲過」的浮層：上方分頁列、對話框、底部動作卡 */
+.tabs,dialog,.card{-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}
 
 /* ===== 頂部 ===== */
 .site-head{background:transparent;color:var(--ink);padding-top:env(safe-area-inset-top,0px)}
@@ -191,27 +191,26 @@ select.inp option{color:#0E3346;background:#fff}
 .voice small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .voice small{display:block;font-size:13px;font-weight:400;color:var(--v-sub);margin-top:2px}
 .voice .wave{flex:none;display:flex;align-items:center;gap:4px;height:40px;margin-left:auto}
-.voice .wave i{display:block;width:4px;height:10px;border-radius:4px;background:currentColor;opacity:.5}
+.voice .wave i{display:block;width:4px;height:28px;border-radius:4px;background:currentColor;opacity:.5;transform:scaleY(.36);will-change:auto}
+.voice .wave i:nth-child(2){transform:scaleY(.6)}.voice .wave i:nth-child(3){transform:scaleY(.85)}.voice .wave i:nth-child(4){transform:scaleY(.5)}
 .voice:active{transform:scale(.985)}
 .voice.on{--v-bg:linear-gradient(135deg,#EA7356 0%,#D4502F 100%);--v-fg:#FFFFFF;--v-sub:rgba(255,255,255,.88);--v-tile:#FFFFFF;--v-tile-fg:#D4502F;--v-ring:rgba(255,255,255,.75);
   transform:scale(.98);box-shadow:0 0 0 6px rgba(234,115,86,.25),0 18px 36px -16px rgba(150,40,20,.6)}
 .voice.busy .v-txt{opacity:.85}
 @media (max-width:360px){.voice .wave{display:none}}
 @media (prefers-reduced-motion:no-preference){
-  .voice::after{animation:v-sheen 4.2s ease-in-out 1s infinite}
-  .voice .mic::before{animation:v-ring 2.4s ease-out infinite}
-  .voice .mic::after{animation:v-ring 2.4s ease-out 1.2s infinite}
-  .voice .wave i{animation:v-bar 1.6s ease-in-out infinite}
-  .voice .wave i:nth-child(2){animation-delay:.15s}.voice .wave i:nth-child(3){animation-delay:.3s}.voice .wave i:nth-child(4){animation-delay:.45s}.voice .wave i:nth-child(5){animation-delay:.6s}
+  /* v15 省電：沒按的時候完全靜止（只在載入時閃一次光澤）；按住說話時才動，而且只動 transform／opacity，不觸發版面重算 */
+  .voice::after{animation:v-sheen 1.8s ease-in-out .8s 1}
+  .voice.on .mic::before{animation:v-ring 1s ease-out infinite}
+  .voice.on .mic::after{animation:v-ring 1s ease-out .5s infinite}
+  .voice.on .wave i{animation:v-bar .55s ease-in-out infinite;opacity:1}
+  .voice.on .wave i:nth-child(2){animation-delay:.08s}.voice.on .wave i:nth-child(3){animation-delay:.16s}.voice.on .wave i:nth-child(4){animation-delay:.24s}.voice.on .wave i:nth-child(5){animation-delay:.32s}
   .voice.on::after{animation:none}
-  .voice.on .mic::before,.voice.on .mic::after{animation-duration:1s}
-  .voice.on .mic::after{animation-delay:.5s}
-  .voice.on .wave i{animation-duration:.55s;opacity:1}
-  .voice.busy .wave i{animation:v-dot 1s ease-in-out infinite}
+  .voice.busy .wave i{animation:v-dot 1s ease-in-out 3}
   .voice.busy .wave i:nth-child(2){animation-delay:.1s}.voice.busy .wave i:nth-child(3){animation-delay:.2s}.voice.busy .wave i:nth-child(4){animation-delay:.3s}.voice.busy .wave i:nth-child(5){animation-delay:.4s}
   @keyframes v-ring{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.5);opacity:0}}
-  @keyframes v-bar{0%,100%{height:8px;opacity:.45}50%{height:28px;opacity:.95}}
-  @keyframes v-dot{0%,100%{height:6px;opacity:.35}50%{height:6px;opacity:1;transform:translateY(-5px)}}
+  @keyframes v-bar{0%,100%{transform:scaleY(.29);opacity:.45}50%{transform:scaleY(1);opacity:.95}}
+  @keyframes v-dot{0%,100%{transform:scaleY(.21);opacity:.35}50%{transform:translateY(-5px) scaleY(.21);opacity:1}}
   @keyframes v-sheen{0%{transform:translateX(-110%)}45%,100%{transform:translateX(110%)}}
 }
 .heard:empty{min-height:0;margin:0}
@@ -400,6 +399,34 @@ dialog .acts .btn{flex:1}
 .stats-bar .seg.small button{min-width:48px}
 .bar-r{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
 .del-match,.csv-btn{min-height:38px;padding:4px 16px;font-size:14px}
+/* v14：圖表進場動畫（只在切換分頁／篩選、打開數據頁時播放；背景同步不重播；系統設定「減少動態效果」時關閉） */
+@media (prefers-reduced-motion:no-preference){
+  @keyframes vGrowX{from{transform:scaleX(0)}}
+  @keyframes vGrowY{from{transform:scaleY(0)}}
+  @keyframes vRise{from{opacity:0;transform:translateY(8px)}}
+  @keyframes vPop{0%{opacity:0;transform:scale(.2)}70%{opacity:1;transform:scale(1.12)}100%{transform:scale(1)}}
+  @keyframes vFade{from{opacity:0}}
+  @keyframes vDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+  @keyframes vDash{from{stroke-dasharray:0 400}}
+  @keyframes vRadar{from{opacity:0;transform:scale(.1)}}
+  .anim .divrow .dv i,.anim .mixrow .tr i,.anim .stack i,.anim .cmprow .bars i,.anim .pbar i{animation:vGrowX .65s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*55ms + 60ms)}
+  .anim .divrow .dv .l i{transform-origin:right center}
+  .anim .divrow .dv .r i,.anim .mixrow .tr i,.anim .stack i,.anim .cmprow .bars i,.anim .pbar i{transform-origin:left center}
+  .anim .divrow,.anim .mixrow,.anim .cmprow,.anim .leg,.anim tr.row,.anim .heat tbody tr,.anim .res-line,.anim .nlist li{animation:vRise .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
+  .anim .heat td:not(.z){animation:vPop .4s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*45ms + var(--j,0)*18ms + 80ms)}
+  .anim .avg>div,.anim .stat-tile{animation:vRise .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*50ms)}
+  .anim .ln{stroke-dasharray:1;animation:vDraw 1s cubic-bezier(.4,0,.2,1) both}
+  .anim .ana-chart circle:not(.hit),.anim .tchart circle:not(.hit){transform-box:fill-box;transform-origin:center;animation:vPop .4s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*40ms + .45s)}
+  .anim .ana-chart text.lb,.anim .tchart text.dl{animation:vFade .5s both;animation-delay:.6s}
+  .anim .gbar{transform-box:fill-box;animation:vGrowY .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+  .anim .gbar.pos{transform-origin:center bottom}.anim .gbar.neg{transform-origin:center top}
+  .anim .gval{animation:vFade .4s both;animation-delay:calc(var(--i,0)*70ms + .45s)}
+  .anim .rad{transform-box:view-box;animation:vRadar .75s cubic-bezier(.2,.8,.2,1) both}
+  .anim .rad.tm{animation-delay:.12s}
+  .anim .seg{animation:vDash .8s cubic-bezier(.4,0,.2,1) both;animation-delay:calc(var(--i,0)*90ms)}
+  .anim .donut .ctr,.anim .donut .ctl{animation:vFade .5s both;animation-delay:.3s}
+}
+@media print{*,*::before,*::after{animation:none!important}}
 /* v13：AI 分析匯出 */
 .ai-steps{margin:10px 0 12px;padding-left:1.3em;font-size:14px;line-height:1.7}
 .ai-chk{display:flex;gap:8px;align-items:center;font-size:14px;margin:6px 0}
@@ -499,7 +526,7 @@ table.stand{width:100%;border-collapse:separate;border-spacing:0;background:var(
 .plist li{flex-wrap:wrap}
 .plist button.try{padding:5px 12px}
 .plist button.try.on{background:#D4502F;color:#fff;border-color:transparent}
-@media (prefers-reduced-motion:no-preference){.plist button.try.on{animation:try-pulse 1s ease-in-out infinite}@keyframes try-pulse{50%{box-shadow:0 0 0 6px rgba(212,80,47,.22)}}}
+@media (prefers-reduced-motion:no-preference){.plist button.try.on{animation:try-pulse 1s ease-in-out 6}@keyframes try-pulse{50%{box-shadow:0 0 0 6px rgba(212,80,47,.22)}}}
 .tryres{flex-basis:100%;margin:6px 0 2px;padding:10px 12px;border-radius:var(--r-sm);background:var(--glass-2);border:1px solid var(--glass-bd);font-size:13px}
 .tryres .muted{color:var(--muted)}
 .tryres p{margin:0 0 6px;font-weight:500}
@@ -1414,7 +1441,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
 
 /* ====================== 設定 ====================== */
 // 部署好 Apps Script 後，把網址貼在這裡。留空＝示範模式（資料只存在這台裝置）。
-const APP_VERSION = "v13";          // 要和 sw.js 的 VERSION（vs-v13）一致
+const APP_VERSION = "v15";          // 要和 sw.js 的 VERSION（vs-v15）一致
 const APP_DATE = "2026-10-16";
 const API_URL = "https://script.google.com/macros/s/AKfycbxzWvE9BmA6tQuVMx7A249z0hD7NB_jMRTh3XK6U-hdSp9FwC8ScAoYte83PvLJpacOvQ/exec";
 const SYNC_EVERY_MS = 8000;        // 有待送資料時多久重試一次
@@ -2543,9 +2570,12 @@ async function refreshStats(){
   try{
     const r=await api({action:"events",token:auth.token});
     if(!r.ok){ if(r.error==="auth") needAuth(); return; }
+    const same=JSON.stringify([serverEvents,serverNotes])===JSON.stringify([r.events,r.notes||[]]);
     serverEvents=r.events; store.set(K("server"),serverEvents);
     serverNotes=r.notes||[]; store.set(K("notes"),serverNotes);
     lastStats=Date.now(); setOffline(false);
+    if(same){ const n=$("statsNote"); if(n&&!$("stats").hidden) n.textContent=n.textContent.replace(/ 伺服器資料更新於 [\d:]+。/,"")+` 伺服器資料更新於 ${hhmm(lastStats)}。`; return; }   // 資料沒變就不重畫（不打斷進場動畫）
+    if(Date.now()-animAt<1000) animNext=true;      // 剛打開就收到新資料：重新播放一次動畫，而不是畫到一半跳掉
     renderStats(); renderScore(); if(prefs.court) renderPlayers();
   }catch(e){ setOffline(true); }
 }
@@ -2556,6 +2586,7 @@ function mergedEvents(){
 }
 function renderStats(){
   if(!auth||!boot) return;
+  anaMemo=null;                       // 資料可能變了：這次重畫重新計算一次
   const k=isAdmin()?(prefs.statsTeam&&teams().some(t=>t.key===prefs.statsTeam)?prefs.statsTeam:curTeam()):auth.scope;
   $("statsTeamRow").hidden=!isAdmin();
   if(isAdmin()) $("statsTeamSel").innerHTML=teams().map(t=>`<option value="${t.key}" ${t.key===k?"selected":""}>${esc(t.key+"｜"+t.name)}</option>`).join("");
@@ -2625,6 +2656,7 @@ function renderStats(){
     }).join(""):`<tr><td colspan="6" style="text-align:center;color:var(--muted)">沒有隊員資料</td></tr>`)+`</tbody>`;
   const pend=list.reduce((s,r)=>s+r.pending,0);
   $("statsNote").textContent = (pend?` 含這台手機尚未送出的 ${pend} 筆。`:"") + (lastStats?` 伺服器資料更新於 ${hhmm(lastStats)}。`:"");
+  vizAnimate();
 }
 /* ---------- 歷史趨勢：每場得分／失誤折線＋每場平均 ---------- */
 let trendWho="ALL";
@@ -2663,8 +2695,8 @@ function drawTrend(pts){
   let g=""; for(let v=0;v<=top;v+=step) g+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"/><text class="ax" x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v}</text>`;
   const every=Math.ceil(pts.length/Math.max(1,Math.floor((W-L-R)/64)));
   const xl=pts.map((x,i)=>i%every&&i!==pts.length-1?"":`<text class="xl" x="${X(i)}" y="${H-B+16}" text-anchor="middle">${esc(x.m.date?x.m.date.slice(5).replace("-","/"):"")}</text><text class="xl" x="${X(i)}" y="${H-B+30}" text-anchor="middle">${esc((x.m.opponent||"").slice(0,4))}${x.res?(x.res==="W"?" 勝":" 負"):""}</text>`).join("");
-  const line=(key,c)=>`<path d="${pts.map((x,i)=>(i?"L":"M")+X(i)+" "+Y(x[key])).join(" ")}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`+
-    pts.map((x,i)=>`<circle cx="${X(i)}" cy="${Y(x[key])}" r="4" fill="${c}" stroke="var(--glass-hi)" stroke-width="2"/>`).join("");
+  const line=(key,c)=>`<path class="ln" pathLength="1" d="${pts.map((x,i)=>(i?"L":"M")+X(i)+" "+Y(x[key])).join(" ")}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`+
+    pts.map((x,i)=>`<circle style="--i:${i}" cx="${X(i)}" cy="${Y(x[key])}" r="4" fill="${c}" stroke="var(--glass-hi)" stroke-width="2"/>`).join("");
   const li=pts.length-1, lp=pts[li], gap=Math.abs(Y(lp.pt)-Y(lp.er))<14;
   const dl=`<text class="dl" x="${X(li)+8}" y="${Y(lp.pt)+(gap&&lp.pt>=lp.er?-4:4)}">${lp.pt}</text><text class="dl" x="${X(li)+8}" y="${Y(lp.er)+(gap&&lp.er>lp.pt?-4:gap?12:4)}">${lp.er}</text>`;
   const hits=pts.map((x,i)=>{ const w=pts.length===1?W-L-R:(W-L-R)/(pts.length-1); return `<rect class="hit" data-i="${i}" x="${X(i)-w/2}" y="${T}" width="${w}" height="${H-T-B}"/>`; }).join("");
@@ -2711,7 +2743,14 @@ $("notesList").addEventListener("click",e=>{
    全部從逐球紀錄重播：每一球的勝負、當時誰發球、第幾輪、P1 是誰。依數據頁上方的場次／局數篩選。 */
 let anaTab="flow", anaSet="", anaDraw=null;
 const pct=(a,b)=>b?Math.round(a/b*100):null;
+/* v15：同一次重畫裡，分析圖表、局段、贏輸局都要逐球重播，結果相同 → 只算一次 */
+let anaMemo=null;
 function anaRallies(ms){
+  const key=statsFilter+"|"+statsSet+"|"+ms.map(m=>m.id).join(",");
+  if(anaMemo&&anaMemo.key===key) return anaMemo.val;
+  const sets=anaRalliesRaw(ms); anaMemo={key,val:sets}; return sets;
+}
+function anaRalliesRaw(ms){
   const sets=[];
   ms.filter(m=>statsFilter==="all"||m.id===statsFilter).forEach(m=>{
     for(let s=1;s<=5;s++){
@@ -2772,7 +2811,7 @@ function drawFlow(pts){
   const xs=Math.max(1,Math.ceil(n/Math.max(1,Math.floor((W-L-R)/40))));
   for(let i=xs;i<=n;i+=xs) g+=`<text class="ax" x="${X(i)}" y="${H-6}" text-anchor="middle">${i}</text>`;
   const step_=k=>"M"+X(0)+" "+Y(0)+pts.slice(1).map((p,i)=>` H${X(i+1)} V${Y(p[k])}`).join("");
-  const line=(k,c)=>`<path d="${step_(k)}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const line=(k,c)=>`<path class="ln" pathLength="1" d="${step_(k)}" fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>`;
   const w=n?(W-L-R)/n:W-L-R;
   const hits=pts.slice(1).map((p,i)=>`<rect class="hit" data-i="${i+1}" x="${X(i+1)-w/2}" y="${T}" width="${w}" height="${H-T-B}"/>`).join("");
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="這一局每一球之後的比分">${g}<line class="cross" id="fCross" x1="0" x2="0" y1="${T}" y2="${H-B}" style="display:none"/>${line("t","var(--c-er)")}${line("u","var(--c-pt)")}${hits}</svg><div class="tip" id="fTip" hidden></div>`;
@@ -2873,6 +2912,38 @@ function anaSkill(all){
     <p class="lead" style="margin-top:8px">攻擊＝殺球、吊球（失分含攻擊失誤、被攔死）；接發＝接對方發球；防守＝接對方攻擊或吊球；犯規＝觸網、違例。有記對方方式時：對方殺球、吊球得分算我方防守失分，對方發球得分算接發，對方攔網得分算攻擊。</p>`;
 }
 
+/* ---------- v14：圖表進場動畫 ----------
+   只有使用者動作（打開數據頁、切換分頁／場次／局數／隊員）後的那一次重畫才播放；背景同步重畫時直接顯示結果，不會一直閃。 */
+let animNext=true, animT=null, animTok=0, animAt=0;
+const reduceMotion=()=>!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
+function vizAnimate(){
+  const panel=$("stats");
+  if(!animNext||reduceMotion()||panel.hidden||document.body.classList.contains("printing")){ if(!animNext){ /* 背景重畫：停掉進行中的動畫與數字跳動，直接顯示結果 */ panel.classList.remove("anim"); animTok++; } return; }
+  animNext=false;
+  // 同一層的列依序編號（--i），熱力圖的格子再加欄號（--j），做出一列一列出現的效果
+  const sel=".divrow,.mixrow,.cmprow,.leg,tr,.res-line,.nlist li,.avg>div,.stat-tile";
+  const cnt=new Map();
+  panel.querySelectorAll(sel).forEach(el=>{ if(el.style.getPropertyValue("--i")) return; const p=el.parentNode, n=cnt.get(p)||0; cnt.set(p,n+1); el.style.setProperty("--i",Math.min(n,16)); });
+  panel.querySelectorAll(".heat tbody tr").forEach(tr=>[...tr.children].forEach((td,j)=>td.style.setProperty("--j",Math.min(j,20))));
+  // v15：不再用 offsetWidth 強迫瀏覽器立刻重排版；先拿掉、下一幀再加上，效果一樣但省一次完整版面計算
+  panel.classList.remove("anim"); requestAnimationFrame(()=>{ panel.classList.add("anim"); }); animAt=Date.now();
+  clearTimeout(animT); animT=setTimeout(()=>panel.classList.remove("anim"),2200);
+  // 數字往上跳：得分／失誤／淨值／效率，以及各圖上方的小數字卡
+  const tok=++animTok;
+  panel.querySelectorAll(".stat-tile b,.avg b").forEach(el=>{
+    const m=/^([+\-−]?)(\d+(?:\.\d+)?)(%| 次| 局| 分)?$/.exec(el.textContent.trim()); if(!m) return;
+    const sign=m[1], to=parseFloat(m[2]), dec=(m[2].split(".")[1]||"").length, suf=m[3]||"", final=el.textContent;
+    if(!to) return;
+    const t0=performance.now(), dur=650;
+    const step=now=>{ if(tok!==animTok||!el.isConnected) return; const k=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-k,3);
+      el.textContent=k<1?sign+(to*e).toFixed(dec)+suf:final; if(k<1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+// 數據頁裡的分頁、場次、局數按鈕和下拉選單 → 下一次重畫播放動畫（捕獲階段，比原本的處理先執行）
+$("stats").addEventListener("click",e=>{ if(e.target.closest("button[data-a],button[data-v],button[data-f],button[data-s]")) animNext=true; },true);
+$("stats").addEventListener("change",e=>{ if(e.target.matches("select")) animNext=true; },true);
+
 /* ====================== v12：團隊圖表、個人圖表 ======================
    全部依數據頁上方的場次／局數篩選。「每局」＝除以上場局數（有局比分名單用名單，沒有就看哪幾局有他的紀錄）。 */
 let tvTab="contrib", pvTab="radar", pvWho="", vizDraw={};
@@ -2961,7 +3032,7 @@ function drawQuad(pts){
       .filter(c=>c.b.x1>=L-4&&c.b.x2<=W-2);
     const pick=cand.find(c=>!boxes.some(b=>hit(b,c.b))&&!dotsBox.some(b=>hit(b,c.b)))||cand.find(c=>!boxes.some(b=>hit(b,c.b)))||cand[0]||{lx:o.x+10,ly:o.y+4,anc:"start",b:{x1:0,x2:0,y1:0,y2:0}};
     Object.assign(o,pick); boxes.push(pick.b); });
-  const dots=lab.map(o=>`<circle cx="${o.x}" cy="${o.y}" r="6" fill="var(--c-pt)" stroke="var(--glass-hi)" stroke-width="2"/><text class="lb" x="${o.lx}" y="${o.ly}" text-anchor="${o.anc}">${esc(o.p.x.p.name)}</text>`).join("");
+  const dots=lab.map((o,i)=>`<circle style="--i:${i}" cx="${o.x}" cy="${o.y}" r="6" fill="var(--c-pt)" stroke="var(--glass-hi)" stroke-width="2"/><text class="lb" x="${o.lx}" y="${o.ly}" text-anchor="${o.anc}">${esc(o.p.x.p.name)}</text>`).join("");
   const hits=lab.map(o=>`<circle class="hit" cx="${o.x}" cy="${o.y}" r="16"${tipA(`<b>${esc(o.p.x.p.name)}</b>・上場 ${o.p.x.sp} 局<br>每局得分 ${f1(o.p.b)}・每局失誤 ${f1(o.p.a)}<br>全隊平均：得分 ${f1(ay)}・失誤 ${f1(ax)}`)}/>`).join("");
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="隊員每局得分與每局失誤散佈圖">${g}${dots}${hits}</svg>`;
 }
@@ -3054,8 +3125,8 @@ function pvRadar(me,ps){
   return `<p class="lead"><b>${esc(me.p.name)}</b>・上場 ${me.sp} 局。以全隊每局最高的人為 100 分。${hi[0]>5?`最突出：<b>${AX[hi[1]][0]}</b>`:""}${lo[0]<-5?`${hi[0]>5?"；":""}低於全隊平均最多：<b>${AX[lo[1]][0]}</b>`:""}</p>
     <div class="legend"><span><i style="background:var(--c-pt)"></i>${esc(me.p.name)}</span><span><i style="background:var(--muted)"></i>全隊平均（虛線）</span></div>
     <div class="ana-chart" style="max-width:380px;margin:0 auto"><svg viewBox="0 0 ${S} 300" role="img" aria-label="${esc(me.p.name)}的能力雷達圖">${g}
-      <polygon points="${poly(team)}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
-      <polygon points="${poly(mine)}" fill="color-mix(in srgb,var(--c-pt) 22%,transparent)" stroke="var(--c-pt)" stroke-width="2" stroke-linejoin="round"/>${dots}${lab}</svg></div>
+      <polygon class="rad tm" style="transform-origin:${cx}px ${cy}px" points="${poly(team)}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <polygon class="rad" style="transform-origin:${cx}px ${cy}px" points="${poly(mine)}" fill="color-mix(in srgb,var(--c-pt) 22%,transparent)" stroke="var(--c-pt)" stroke-width="2" stroke-linejoin="round"/>${dots}${lab}</svg></div>
     <p class="lead">發球含「發球好球」、防守是「救球成功」、一傳看「接發失誤＋接發未到位」——表現類有記才準。一傳穩定、低失誤是反向計算（越少分數越高）。</p>`;
 }
 
@@ -3087,7 +3158,7 @@ function pvDonut(me){
     const tot=rows.reduce((s,r)=>s+r[1],0); if(!tot) return "";
     const cs=rows.map((_,i)=>`color-mix(in srgb,${color} ${Math.max(30,100-i*16)}%,transparent)`);
     const r=52, C=2*Math.PI*r, gap=rows.length>1?2:0; let off=0;
-    const segs=rows.map(([n,v],i)=>{ const len=v/tot*C, s=`<circle cx="75" cy="75" r="${r}" fill="none" stroke="${cs[i]}" stroke-width="20" stroke-dasharray="${Math.max(.5,len-gap)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 75 75)"${tipA(`<b>${esc(n)}</b> ${v} 次・${pct(v,tot)}%`)}/>`; off+=len; return s; }).join("");
+    const segs=rows.map(([n,v],i)=>{ const len=v/tot*C, s=`<circle class="seg" style="--i:${i}" cx="75" cy="75" r="${r}" fill="none" stroke="${cs[i]}" stroke-width="20" stroke-dasharray="${Math.max(.5,len-gap)} ${C}" stroke-dashoffset="${-off}" transform="rotate(-90 75 75)"${tipA(`<b>${esc(n)}</b> ${v} 次・${pct(v,tot)}%`)}/>`; off+=len; return s; }).join("");
     return `<div class="donut"><div class="mixhd" style="--c:${color};align-self:stretch">${title}</div><svg viewBox="0 0 150 150" role="img" aria-label="${title}組成">${segs}<text class="ctr" x="75" y="80" text-anchor="middle">${tot}</text><text class="ctl" x="75" y="97" text-anchor="middle">${cat==="表現"?"次":"分"}</text></svg>
       <div>${rows.map(([n,v],i)=>`<div class="leg"><i style="background:${cs[i]}"></i><span>${esc(n)}</span><span class="n">${v}</span><span class="pc">${pct(v,tot)}%</span></div>`).join("")}</div></div>`; };
   const html=part("得分","var(--c-pt)","得分")+part("失誤","var(--c-er)","失誤")+part("表現","var(--pf)","表現（不計分）");
@@ -3116,9 +3187,9 @@ function drawGames(pts){
   let g=""; for(let v=bot;v<=top;v+=st) g+=`<line class="gl" x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}"${v===0?' style="stroke:var(--ink-line)"':""}/><text class="ax" x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v}</text>`;
   const every=Math.ceil(n/Math.max(1,Math.floor((W-L-R)/52)));
   const bars=pts.map((x,i)=>{ const y0=Y(0), y1=Y(x.net), h=Math.max(2,Math.abs(y1-y0)), y=x.net>=0?y0-h:y0, c=x.net>=0?"var(--c-pt)":"var(--c-er)";
-    const lbl=n<=14?`<text class="lb" x="${X(i)}" y="${x.net>=0?y-5:y+h+13}" text-anchor="middle" style="font-family:var(--num)">${sgn(x.net)}</text>`:"";
+    const lbl=n<=14?`<text class="lb gval" style="--i:${i}" x="${X(i)}" y="${x.net>=0?y-5:y+h+13}" text-anchor="middle" style="font-family:var(--num)">${sgn(x.net)}</text>`:"";
     const xl=i%every&&i!==n-1?"":`<text class="sm" x="${X(i)}" y="${H-B+15}" text-anchor="middle">${esc(x.lb)}</text>${x.sub?`<text class="sm" x="${X(i)}" y="${H-B+29}" text-anchor="middle">${esc(x.sub)}</text>`:""}`;
-    return `<rect x="${X(i)-w/2}" y="${y}" width="${w}" height="${h}" rx="4" fill="${c}"/>${lbl}${xl}<rect class="hit" x="${X(i)-bw/2}" y="${T}" width="${bw}" height="${H-T-B}"${tipA(`<b>${esc(x.full||x.lb)}</b><br>得分 ${x.pt}・失誤 ${x.er}・淨值 ${sgn(x.net)}<br>效率 ${x.eff==null?"–":sgn(x.eff)+"%"}`)}/>`; }).join("");
+    return `<rect class="gbar ${x.net>=0?"pos":"neg"}" style="--i:${i}" x="${X(i)-w/2}" y="${y}" width="${w}" height="${h}" rx="4" fill="${c}"/>${lbl}${xl}<rect class="hit" x="${X(i)-bw/2}" y="${T}" width="${bw}" height="${H-T-B}"${tipA(`<b>${esc(x.full||x.lb)}</b><br>得分 ${x.pt}・失誤 ${x.er}・淨值 ${sgn(x.net)}<br>效率 ${x.eff==null?"–":sgn(x.eff)+"%"}`)}/>`; }).join("");
   el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="每場淨值長條圖">${g}${bars}</svg>`;
 }
 
@@ -3313,6 +3384,7 @@ $("csvDlg").addEventListener("click",e=>{ const b=e.target.closest("[data-csv]")
 $("csvClose").addEventListener("click",()=>$("csvDlg").close());
 /* ---------- v13：AI 分析匯出（把每張圖背後的數字整理成純文字，貼給 Claude／ChatGPT 分析） ---------- */
 function aiReport(o){
+  anaMemo=null;
   const {k,list,evs,ms,scs,teamEvs,scope}=statSnap, team=teamOf(k).name, ps=vizData(list,evs);
   const inScope=ms.filter(m=>statsFilter==="all"||m.id===statsFilter);
   const alias={}; ps.forEach((x,i)=>alias[x.p.id]=o.anon?(x.p.no?"#"+x.p.no:"隊員"+(i+1)):x.p.name);
@@ -3721,7 +3793,7 @@ const tabs=[$("t-rec"),$("t-stats"),$("t-team"),$("t-sus")];
 function show(id){
   currentTab=id;
   tabs.forEach(t=>{ const on=t.getAttribute("aria-controls")===id; t.setAttribute("aria-selected",on); t.tabIndex=on?0:-1; $(t.getAttribute("aria-controls")).hidden=!on; });
-  if(id==="stats"){ renderStats(); refreshStats(); }
+  if(id==="stats"){ animNext=true; renderStats(); refreshStats(); }
   if(id==="team"){ renderTeam(); if(Date.now()-lastBoot>15000) refreshBoot(); }
   if(id==="sus"){ renderSusForm(); renderSus(); refreshSus(); }
   try{ history.replaceState(null,"","#"+id); }catch(e){}
