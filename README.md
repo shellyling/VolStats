@@ -101,7 +101,7 @@ Google 試算表「球員紀錄」── 資料庫
 
 每次修改前端都要：
 
-- `sw.js` 的 `VERSION` 加一版（例如 `vs-v10` → `vs-v11`），舊快取才會被清掉
+- `sw.js` 的 `VERSION` 加一版（例如 `vs-v11` → `vs-v12`），舊快取才會被清掉
 - `index.html` 的 `APP_VERSION`、`APP_DATE` 同步更新（顯示在說明、隊伍頁、頁尾）
 - 若有改 `vendor/` 檔案，要一併更新 `index.html` 裡的 `integrity` 雜湊
 
@@ -126,12 +126,23 @@ Google 試算表「球員紀錄」── 資料庫
 
 | 版本 | 日期 | 內容 |
 |---|---|---|
+| v11 | 2026-10-16 | 版權聲明（Made by Shelly）、LICENSE |
 | v10 | 2026-10-16 | 使用問卷（SUS） |
 | v9 | 2026-10-16 | 對方背號與「對手」分析、修改紀錄、發球／攻擊好球、比分板閃爍回饋 |
 | v8 | 2026-10-16 | 局後報告、技術結構、被攔死／攔網失誤、進攻欄、動作定義 |
 | v7 | 2026-10-16 | 語音筆記、接球失誤、分析圖表 |
 | v6 | 2026-10 | 站位同步到伺服器、逐筆紀錄當下比分與站位 |
 | v5 | 2026-10 | 新 logo、網頁內使用說明 |
+
+---
+
+## 版權與授權
+
+**Made by Shelly** ・ © 2026 Shelly. All rights reserved.
+
+本專案的程式碼、介面設計、文字、圖示與標誌著作權皆屬 Shelly 所有。未經書面同意，不得複製、修改、散布、另行架設或用於商業用途，詳見 [LICENSE](LICENSE)。
+
+第三方元件依原授權使用：[pinyin-pro](https://github.com/zh-lx/pinyin-pro)（MIT License）、Outfit 與 Noto Sans TC 字型（SIL Open Font License 1.1）。
 
 ---
 
@@ -143,4 +154,4 @@ Google 試算表「球員紀錄」── 資料庫
 
 ---
 
-© 2026 你混哪？我混排！・球員得失分紀錄
+Made by Shelly ・ © 2026 Shelly. All rights reserved.

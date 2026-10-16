@@ -1,6 +1,8 @@
 <!DOCTYPE html>
+<!-- 混排球員數據 VolStats ・ Made by Shelly ・ © 2026 Shelly. All rights reserved. 未經同意不得複製、修改或另行架設。 -->
 <html lang="zh-Hant-TW">
 <head>
+<meta name="author" content="Shelly">
 <meta charset="utf-8">
 <!-- 內容安全政策：只允許自己網域的程式、Google 字型，以及連到 Apps Script 後端；其他外部來源一律擋下。
      換後端網址的網域、或加入新的外部資源時，要一起改這一行。 -->
@@ -911,7 +913,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
       <div class="box" style="margin-top:20px">
         <div class="sec-h" style="margin-top:0"><h3>說明與安裝</h3><small>隨時可按右上角 ? 開啟</small></div>
         <div class="help-links"><button class="btn ghost" type="button" data-help="h-quick">使用說明</button><button class="btn ghost" type="button" data-help="h-install">安裝到手機</button><button class="btn ghost" type="button" data-help="h-share">邀請隊友</button></div>
-        <p class="note" style="text-align:center;margin-top:12px">目前版本 <span class="appver"></span>・沒更新到時把 App 完全關掉再開</p>
+        <p class="note" style="text-align:center;margin-top:12px">目前版本 <span class="appver"></span>・沒更新到時把 App 完全關掉再開<br>Made by Shelly・© 2026 Shelly. All rights reserved.</p>
       </div>
     </section>
     <!-- 問卷（v10） -->
@@ -1065,7 +1067,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
   <div class="help-top">
     <div class="ttl">
       <svg viewBox="0 0 512 512" aria-hidden="true"><use href="#vsLogo"/></svg>
-      <h3 id="helpTitle">使用說明<small>混排球員數據・球員得失分紀錄・<span class="appver"></span></small></h3>
+      <h3 id="helpTitle">使用說明<small>混排球員數據・<span class="appver"></span>・Made by Shelly</small></h3>
       <button type="button" class="x" id="helpClose" aria-label="關閉說明">×</button>
     </div>
     <nav class="help-nav" aria-label="說明章節">
@@ -1302,7 +1304,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
   <div class="acts"><button class="btn" type="button" id="reloginBtn">重新登入</button></div>
 </dialog>
 
-<footer><div class="wrap foot-row"><span>© 2026 你混哪？我混排！・球員得失分紀錄・<span class="appver"></span></span><span style="display:flex;gap:8px"><button type="button" data-help="h-quick">使用說明</button><button type="button" id="footInstall" data-help="h-install">📲 安裝成 App</button></span></div></footer>
+<footer><div class="wrap foot-row"><span>Made by Shelly・© 2026 Shelly. All rights reserved.・<span class="appver"></span></span><span style="display:flex;gap:8px"><button type="button" data-help="h-quick">使用說明</button><button type="button" id="footInstall" data-help="h-install">📲 安裝成 App</button></span></div></footer>
 
 <script>
 (function(){
@@ -1310,7 +1312,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
 
 /* ====================== 設定 ====================== */
 // 部署好 Apps Script 後，把網址貼在這裡。留空＝示範模式（資料只存在這台裝置）。
-const APP_VERSION = "v10";          // 要和 sw.js 的 VERSION（vs-v10）一致
+const APP_VERSION = "v11";          // 要和 sw.js 的 VERSION（vs-v11）一致
 const APP_DATE = "2026-10-16";
 const API_URL = "https://script.google.com/macros/s/AKfycbxzWvE9BmA6tQuVMx7A249z0hD7NB_jMRTh3XK6U-hdSp9FwC8ScAoYte83PvLJpacOvQ/exec";
 const SYNC_EVERY_MS = 8000;        // 有待送資料時多久重試一次

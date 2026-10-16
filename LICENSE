@@ -1,0 +1,14 @@
+Copyright (c) 2026 Shelly. All rights reserved.
+
+混排球員數據（VolStats）的程式碼、介面設計、文字、圖示與標誌，著作權皆屬 Shelly 所有。
+
+未經 Shelly 書面同意，不得複製、修改、散布、轉載、另行架設或用於商業用途。
+歡迎透過官方網址使用本 App；使用本 App 不代表取得任何程式碼或設計的授權。
+
+本專案包含的第三方元件依其原授權條款使用：
+- pinyin-pro（vendor/pinyin-pro-3.28.0.min.js）：MIT License，著作權屬原作者
+- Outfit、Noto Sans TC 字型（Google Fonts）：SIL Open Font License 1.1
+
+Unauthorized copying, modification, distribution or commercial use of this
+software, its design, text, icons or logo, via any medium, is strictly
+prohibited without prior written permission from Shelly.
