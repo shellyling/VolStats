@@ -4,7 +4,7 @@
  * - 送到 Apps Script 的 POST 一律不碰（離線佇列由頁面自己處理）
  * 改版時把 VERSION 加 1 可強制清掉舊快取。
  */
-const VERSION = "vs-v6";   // v6：站位同步、逐筆比分；v5：新 logo、網頁內說明
+const VERSION = "vs-v7";   // v7：語音筆記、接球失誤、分析圖表；v6：站位同步、逐筆比分；v5：新 logo、網頁內說明
 const SHELL = ["./", "./index.html", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-maskable-512.png", "./icons/apple-touch-icon.png", "./icons/favicon-64.png", "./icons/favicon-32.png", "./icons/logo.svg",
   "./vendor/pinyin-pro-3.28.0.min.js"];
