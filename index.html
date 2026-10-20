@@ -525,6 +525,17 @@ dialog .acts .btn{flex:1}
 .stat-tile small{display:block;font-weight:500;font-size:12px;color:var(--muted);letter-spacing:.04em}
 .stat-tile b{display:block;font-family:var(--num);font-weight:300;font-size:clamp(32px,8.5vw,44px);line-height:1.1;margin-top:2px}
 .stat-tile.pt b{color:var(--pt)}.stat-tile.er b{color:var(--er)}
+/* v20：主要數據的說明：平常收起來，點右上角「?」才展開 */
+.stat-tile,.avg>div{position:relative}
+.hint{display:none;text-align:left;font-style:normal;font-size:11px;line-height:1.45;color:var(--muted);margin-top:4px;letter-spacing:0;font-weight:400}
+.stat-tile .hint{font-size:12px;margin-top:2px}
+.hint-open>.hint{display:block}
+.hint-q{position:absolute;top:6px;right:6px;width:22px;height:22px;padding:0;border-radius:50%;border:1px solid var(--line);background:var(--glass-2);color:var(--muted);font:600 12px/20px var(--sans);text-align:center;cursor:pointer}
+.hint-q::before{content:"";position:absolute;inset:-9px}      /* 手指好按：點擊範圍放大到約 40px */
+.hint-q:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.hint-open>.hint-q{background:var(--solid);color:var(--solid-fg);border-color:transparent}
+.stat-tile>small:first-child,.avg>div>small:first-child{padding-right:24px}
+@media print{.hint{display:block!important}.hint-q{display:none!important}}
 .tbl-scroll{overflow-x:auto;padding:0 0 8px}
 table.stand{width:100%;border-collapse:separate;border-spacing:0;background:var(--glass);border:1px solid var(--glass-bd);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
 .stand th,.stand td{padding:12px 12px;text-align:left;border-bottom:1px solid var(--line)}
@@ -957,10 +968,10 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
         </span>
       </div>
       <div class="tiles">
-        <div class="stat-tile pt"><small>得分</small><b id="sumPt">0</b></div>
-        <div class="stat-tile er"><small>失誤</small><b id="sumEr">0</b></div>
-        <div class="stat-tile" id="netTile"><small>淨值</small><b id="sumNet">0</b></div>
-        <div class="stat-tile" id="effTile"><small>效率</small><b id="sumEff">–</b></div>
+        <div class="stat-tile pt"><small>得分</small><b id="sumPt">0</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">隊員自己打下來的分數</em></div>
+        <div class="stat-tile er"><small>失誤</small><b id="sumEr">0</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">隊員失誤送給對方的分數</em></div>
+        <div class="stat-tile" id="netTile"><small>淨值</small><b id="sumNet">0</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">得分－失誤；正數＝得分比失誤多</em></div>
+        <div class="stat-tile" id="effTile"><small>效率</small><b id="sumEff">–</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">淨值 ÷（得分＋失誤）；0% 是打平，越高越好</em></div>
       </div>
       <div class="box results" id="resBox" hidden>
         <div class="sec-h" style="margin-top:0"><h3>比賽結果</h3><small id="resNote"></small></div>
@@ -999,7 +1010,8 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
         <div id="pvBody"></div>
       </div>
       <div class="tbl-scroll"><table class="stand" id="statsTable"></table></div>
-      <p class="note">淨值＝得分－失誤；進攻＝發球、殺球、吊球得分減發球失誤、攻擊失誤、被攔死；效率＝淨值 ÷（得分＋失誤）；表現類不算分。點一列可看這位隊員的動作細項與上場局勝率。<span id="statsNote"></span></p>
+      <p class="banner" id="recViewNote" hidden>你是用<b>記錄碼</b>登入，只看得到<b>全隊數據</b>。球員表、個人圖表等個人數據，請用管理碼登入查看。</p>
+      <p class="note"><span id="statsTableNote">淨值＝得分－失誤；進攻＝發球、殺球、吊球得分減發球失誤、攻擊失誤、被攔死；效率＝淨值 ÷（得分＋失誤）；表現類不算分。點一列可看這位隊員的動作細項與上場局勝率。</span><span id="statsNote"></span></p>
       <div class="box" id="notesBox" style="margin-top:18px;padding:14px 18px" hidden>
         <div class="sec-h" style="margin-top:0"><h3>比賽筆記</h3><small id="notesNote"></small></div>
         <ul class="nlist" id="notesList"></ul>
@@ -1014,7 +1026,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
       <div class="empty" id="mgrEmpty" hidden>還沒有任何隊伍。</div>
       <div id="mgrBody">
         <div class="box" id="codeBox">
-          <div class="sec-h" style="margin-top:0"><h3>記錄碼</h3><small>傳給隊友：可以記錄、看數據、加綽號</small></div>
+          <div class="sec-h" style="margin-top:0"><h3>記錄碼</h3><small>傳給隊友：可以記錄、看全隊數據、加綽號</small></div>
           <div class="bigcode" id="recCode">——</div>
           <div class="row-btns">
             <button class="btn" type="button" id="shareCode">分享</button>
@@ -1033,7 +1045,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
           <div class="banner warn" id="legacyCode" hidden>這是舊格式的 6 位數代碼，比較容易被猜中。建議按「重設」換成 8 碼新代碼，再把新代碼傳給隊友。</div>
           <p class="note" id="codeNote">代碼外流時按「重設」：舊代碼和用它登入的手機會立即失效。重設記錄碼不影響管理碼，反之亦然。</p>
         </div>
-        <div class="banner" id="recRoleNote" hidden>你是用<b>記錄碼</b>登入：可以記錄、看數據、幫隊員「試說」並加綽號。要改隊名、新增或編輯隊員、刪除場次，請用管理碼登入。</div>
+        <div class="banner" id="recRoleNote" hidden>你是用<b>記錄碼</b>登入：可以記錄、看全隊數據、幫隊員「試說」並加綽號。要看個人數據、改隊名、新增或編輯隊員、刪除場次，請用管理碼登入。</div>
 
         <form class="box" id="teamForm" style="margin-top:20px" autocomplete="off">
           <div class="sec-h" style="margin-top:0"><h3>隊名與代表色</h3></div>
@@ -1207,8 +1219,8 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
   <h3>用 AI 分析這些數據</h3>
   <p class="note" style="margin:0" id="aiScope"></p>
   <ol class="ai-steps"><li>選分析重點，按「複製」</li><li>打開 Claude 或 ChatGPT，貼上後送出</li><li>AI 會依圖表數據給出優缺點、每位隊員建議和練習方向</li></ol>
-  <label class="field"><span>分析重點</span><select class="inp" id="aiFocus" aria-label="分析重點"></select></label>
-  <label class="ai-chk"><input type="checkbox" id="aiAnon"> 隊員名字改成背號（不想把名字傳給 AI 時勾選）</label>
+  <label class="field" id="aiFocusRow"><span>分析重點</span><select class="inp" id="aiFocus" aria-label="分析重點"></select></label>
+  <label class="ai-chk" id="aiAnonRow"><input type="checkbox" id="aiAnon"> 隊員名字改成背號（不想把名字傳給 AI 時勾選）</label>
   <label class="ai-chk"><input type="checkbox" id="aiNotes" checked> 包含比賽筆記</label>
   <details class="ai-prev"><summary>預覽內容（<span id="aiLen"></span>）</summary><textarea class="inp" id="aiText" readonly rows="10" aria-label="報告內容"></textarea></details>
   <div class="ai-acts">
@@ -1225,8 +1237,8 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
   <h3>匯出 CSV</h3>
   <p class="note" style="margin:0" id="csvScope"></p>
   <div class="csv-opts">
-    <button type="button" data-csv="sum">球員統計<small>每位隊員一列：得分、失誤、淨值、效率、表現、局勝率、各動作次數</small></button>
-    <button type="button" data-csv="raw">逐筆紀錄<small>每一球一列：時間、隊員、動作、當下比分、發球方、輪轉、站位，加上比賽筆記（含對方得失分，適合丟給 AI 分析）</small></button>
+    <button type="button" data-csv="sum" id="csvSum">球員統計<small>每位隊員一列：得分、失誤、淨值、效率、表現、局勝率、各動作次數</small></button>
+    <button type="button" data-csv="raw">逐筆紀錄<small id="csvRawSmall">每一球一列：時間、隊員、動作、當下比分、發球方、輪轉、站位，加上比賽筆記（含對方得失分，適合丟給 AI 分析）</small></button>
   </div>
   <p class="note">用 Excel、Numbers 或 Google 試算表都能直接開啟。</p>
   <div class="acts"><button class="btn ghost" type="button" id="csvClose">關閉</button></div>
@@ -1419,6 +1431,7 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
         <li>上方可選「全部場次」或單一場，再選「整場」或某一局。</li>
         <li><b>淨值</b>＝得分－失誤；<b>效率</b>＝淨值 ÷（得分＋失誤）。例如小新得 6 分、失誤 2 次：淨值 +4、效率 +50%。</li>
         <li>點表格裡的隊員可以看動作細項、上場局勝率與場勝率。</li>
+        <li>用<b>記錄碼</b>登入只看得到全隊數據：球員表、個人圖表、隊員貢獻、攻守象限、動作熱力圖、每位發球者，以及局後報告的「表現最好／需要提醒」都會隱藏，CSV 只能匯出逐筆紀錄（不含隊員）。</li>
         <li>「歷史趨勢」顯示每場得分／失誤折線與每場平均，可切換全隊或個人。</li>
         <li><b>分析圖表</b>：
           <b>比分走勢</b>（每一球後的比分、最長連得／連失、最大領先）、
@@ -1441,7 +1454,8 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
       <table class="htbl">
         <tr><th></th><th>記錄碼<br>（給隊友）</th><th>管理碼<br>（自己保管）</th></tr>
         <tr><td>記錄、撤銷、結束一局</td><td class="y">✓</td><td class="y">✓</td></tr>
-        <tr><td>看數據、匯出 CSV</td><td class="y">✓</td><td class="y">✓</td></tr>
+        <tr><td>看全隊數據、匯出逐筆 CSV</td><td class="y">✓</td><td class="y">✓</td></tr>
+        <tr><td>看個人數據（球員表、個人圖表、隊員貢獻等）</td><td class="n0">—</td><td class="y">✓</td></tr>
         <tr><td>試說、幫隊員加綽號</td><td class="y">✓</td><td class="y">✓</td></tr>
         <tr><td>改隊名、新增／編輯隊員</td><td class="n0">—</td><td class="y">✓</td></tr>
         <tr><td>刪除場次、重設代碼</td><td class="n0">—</td><td class="y">✓</td></tr>
@@ -1513,8 +1527,8 @@ dialog.help{width:min(760px,calc(100vw - 16px));max-width:none;max-height:calc(1
 
 /* ====================== 設定 ====================== */
 // 部署好 Apps Script 後，把網址貼在這裡。留空＝示範模式（資料只存在這台裝置）。
-const APP_VERSION = "v18";          // 要和 sw.js 的 VERSION（vs-v18）一致
-const APP_DATE = "2026-10-19";
+const APP_VERSION = "v20";          // 要和 sw.js 的 VERSION（vs-v20）一致
+const APP_DATE = "2026-10-20";
 const API_URL = "https://script.google.com/macros/s/AKfycbxzWvE9BmA6tQuVMx7A249z0hD7NB_jMRTh3XK6U-hdSp9FwC8ScAoYte83PvLJpacOvQ/exec";
 const SYNC_EVERY_MS = 8000;        // 有待送資料時多久重試一次
 const STATS_REFRESH_MS = 30000;    // 數據頁多久重新讀取伺服器
@@ -1640,7 +1654,7 @@ const demoApi = (function(){
       const codeOf = k => Object.keys(db.codes).find(c=>db.codes[c]===k)||"";
       const recOf = k => { let c=codeOf(k+"~r"); if(!c&&k){ c=newCode(); db.codes[c]=k+"~r"; save(); } return c; };
       if(p.action==="bootstrap") return {ok:true,scope:a.scope,admin:a.admin,serverTime:Date.now(),teams:db.teams.filter(t=>a.canSee(t.key)),players:db.players.filter(x=>a.canSee(x.team)),actions:ACTIONS,matches:db.matches.filter(m=>a.canSee(m.team)&&!m.deleted),scores:db.scores.filter(x=>a.canSee(x.team)&&alive(x.match)),courts:db.courts.filter(x=>a.canSee(x.team)&&alive(x.match)),role:a.role,code:a.role==="mgr"?codeOf(a.scope):"",recCode:a.admin?"":recOf(a.scope)};
-      if(p.action==="events") return {ok:true,serverTime:Date.now(),events:db.events.filter(e=>e.status==="有效"&&a.canSee(e.team)&&!(db.matches.find(m=>m.id===e.match)||{}).deleted).map(e=>e.opp?{id:e.id,t:e.t,match:e.match,set:e.set,team:e.team,action:e.action,opp:e.opp,cat:"對方",value:0,oppNo:e.oppNo||"",oppAct:e.oppAct||""}:{id:e.id,t:e.t,match:e.match,set:e.set,team:e.team,player:e.player,action:e.action,cat:e.cat,value:e.value,sub:e.sub||""}),notes:db.notes.filter(n=>n.status==="有效"&&a.canSee(n.team)&&alive(n.match)).map(n=>({id:n.id,t:n.t,match:n.match,set:n.set,team:n.team,player:n.player,text:n.text,source:n.source,sc:n.sc}))};
+      if(p.action==="events") return {ok:true,serverTime:Date.now(),events:db.events.filter(e=>e.status==="有效"&&a.canSee(e.team)&&!(db.matches.find(m=>m.id===e.match)||{}).deleted).map(e=>e.opp?{id:e.id,t:e.t,match:e.match,set:e.set,team:e.team,action:e.action,opp:e.opp,cat:"對方",value:0,oppNo:e.oppNo||"",oppAct:e.oppAct||""}:{id:e.id,t:e.t,match:e.match,set:e.set,team:e.team,player:a.role==="rec"&&e.dev!==p.device?"":e.player,action:e.action,cat:e.cat,value:e.value,sub:e.sub||""}),notes:db.notes.filter(n=>n.status==="有效"&&a.canSee(n.team)&&alive(n.match)).map(n=>({id:n.id,t:n.t,match:n.match,set:n.set,team:n.team,player:n.player,text:n.text,source:n.source,sc:n.sc}))};
       if(p.action==="team"){
         const team=a.admin?String(p.team||""):a.scope, t=db.teams.find(x=>x.key===team);
         if(!t||!a.canSee(team)) return {ok:false,error:"forbidden"};
@@ -1674,7 +1688,7 @@ const demoApi = (function(){
             if(e.action==="OPP_ERR"||e.action==="OPP_PT"){ db.events.push({id:e.id,t:Date.parse(e.deviceTime)||Date.now(),match:m.id,set:e.set,team,action:e.action,opp:e.action==="OPP_ERR"?"pt":"er",cat:"對方",value:0,sc:e.sc,oppNo:/^\d{1,3}$/.test(e.oppNo||"")?e.oppNo:"",oppAct:e.oppAct||"",status:"有效"}); return done.push(op.key); }
             const pl=db.players.find(x=>x.id===e.player); if(!pl||pl.team!==team) return rej("bad_player");
             const ac=ACTIONS.find(x=>x.code===e.action); if(!ac) return rej("bad_action");
-            db.events.push({id:e.id,t:Date.parse(e.deviceTime)||Date.now(),match:m.id,set:e.set,team,player:pl.id,action:ac.code,cat:ac.cat,value:ac.value,sc:e.sc,sub:ac.subs.includes(e.sub)?e.sub:"",status:"有效"}); done.push(op.key); }
+            db.events.push({id:e.id,t:Date.parse(e.deviceTime)||Date.now(),dev:p.device,match:m.id,set:e.set,team,player:pl.id,action:ac.code,cat:ac.cat,value:ac.value,sc:e.sc,sub:ac.subs.includes(e.sub)?e.sub:"",status:"有效"}); done.push(op.key); }
           else if(op.op==="court"){ const c=op.c||{}, m=db.matches.find(x=>x.id===c.match&&!x.deleted); if(!m||!a.canSee(m.team)) return rej("bad_match");
             const old=db.courts.find(x=>x.match===m.id&&x.set===c.set); if(old&&old.upd>c.upd) return done.push(op.key);
             db.courts=db.courts.filter(x=>x!==old); db.courts.push({match:m.id,team:m.team,set:c.set,lineup:c.lineup,serve:c.serve,libero:c.libero||"",t0:c.t0,log:c.log||[],upd:c.upd}); done.push(op.key); }
@@ -1737,6 +1751,8 @@ const teams = () => (boot && boot.teams) || [];
 const isAdmin = () => !!(auth && auth.scope==="ADMIN");
 const role = () => isAdmin() ? "admin" : ((boot&&boot.role) || (auth&&auth.role) || "mgr");
 const canManage = () => role()!=="rec";
+/* v19：看個人數據（球員表、個人圖表、逐人的圖表）要用管理碼；記錄碼只看全隊合計 */
+const canSeePlayers = () => role()!=="rec";
 const curTeam = () => isAdmin() ? (teams().some(t=>t.key===prefs.team) ? prefs.team : (teams()[0]||{}).key) : auth.scope;
 const teamOf = k => teams().find(t=>t.key===k) || {key:k,name:k,color:"#8C7B68",fg:"#FFF6E6"};
 const allPlayersOf = k => ((boot && boot.players)||[]).filter(p=>p.team===k);
@@ -2809,7 +2825,7 @@ let statsFilter="all", statsSet="all", openRow=null, statSnap=null;
 async function refreshStats(){
   if(!auth) return;
   try{
-    const r=await api({action:"events",token:auth.token});
+    const r=await api({action:"events",token:auth.token,device});
     if(!r.ok){ if(r.error==="auth") needAuth(); return; }
     const same=JSON.stringify([serverEvents,serverNotes])===JSON.stringify([r.events,r.notes||[]]);
     serverEvents=r.events; store.set(K("server"),serverEvents);
@@ -2853,10 +2869,15 @@ function renderStats(){
   const rows={}; allPlayersOf(k).forEach(p=>rows[p.id]={p,pt:0,er:0,pf:0,by:{},sub:{},pending:0,sets:0,wins:0});
   const byAct={}, bySub={};
   const addSub=(m,e)=>{ const x=m[e.action]=m[e.action]||{}; const n=e.sub||""; x[n]=(x[n]||0)+1; };
-  evs.forEach(e=>{ const r=rows[e.player]; if(!r) return; const v=Number(e.value)||1;
+  // v19：全隊合計直接從紀錄算（記錄碼拿到的紀錄可能沒有隊員欄，也要算進全隊）
+  const teamRow={p:{id:"",name:"全隊"},pt:0,er:0,pf:0,by:byAct,sub:bySub,pending:0,sets:0,wins:0};
+  evs.forEach(e=>{ const v=Number(e.value)||1;
+    if(e.cat==="表現") teamRow.pf++; else if(e.cat==="失誤") teamRow.er+=v; else teamRow.pt+=v;
+    byAct[e.action]=(byAct[e.action]||0)+1; if(e.local) teamRow.pending++; if(e.cat!=="表現") addSub(bySub,e);
+    const r=rows[e.player]; if(!r) return;
     if(e.cat==="表現") r.pf++; else if(e.cat==="失誤") r.er+=v; else r.pt+=v;
-    r.by[e.action]=(r.by[e.action]||0)+1; byAct[e.action]=(byAct[e.action]||0)+1; if(e.local) r.pending++;
-    if(e.cat!=="表現"){ addSub(bySub,e); addSub(r.sub,e); } });
+    r.by[e.action]=(r.by[e.action]||0)+1; if(e.local) r.pending++;
+    if(e.cat!=="表現") addSub(r.sub,e); });
   // 局比分 → 比賽結果、每人上場局勝率
   const scs=scoresOf(k).filter(x=>alive.has(x.match)&&(statsFilter==="all"||x.match===statsFilter)&&(statsSet==="all"||x.set===statsSet));
   scs.forEach(x=>{
@@ -2874,7 +2895,7 @@ function renderStats(){
   renderTrend(k, ms, teamEvs);
   renderAnalysis(ms); renderNotes(k, ms);
   const list=Object.values(rows).filter(r=>r.p.active!==false||r.pt||r.er||r.pf).sort((a,b)=>(b.pt-b.er)-(a.pt-a.er)||b.pt-a.pt||a.er-b.er);
-  const pt=list.reduce((s,r)=>s+r.pt,0), er=list.reduce((s,r)=>s+r.er,0);
+  const pt=teamRow.pt, er=teamRow.er, seeP=canSeePlayers();
   const effOf=(p,e)=>p+e?Math.round((p-e)/(p+e)*100):null;
   const fmtEff=v=>v==null?"–":(v>0?"+":"")+v+"%";
   const tone=v=>v>0?"pt":v<0?"er":"";
@@ -2884,15 +2905,17 @@ function renderStats(){
   const mix=(acts,count,max,subs)=>acts.filter(a=>count[a.code]).map(a=>`<div class="mixrow ${a.cat==="失誤"?"er":a.cat==="表現"?"pf":""}"><span class="lb">${esc(a.name)}</span><span class="tr"><i style="width:${Math.max(4,count[a.code]/max*100)}%"></i></span><span class="ct">${count[a.code]}</span></div>${subLine(subs&&subs[a.code])}`).join("");
   const maxAct=Math.max(1,...Object.values(byAct));
   const ptActs=actions().filter(a=>a.cat==="得分"), erActs=actions().filter(a=>a.cat==="失誤"), pfActs=actions().filter(a=>a.cat==="表現");
-  const pfTotal=evs.filter(e=>e.cat==="表現"&&rows[e.player]).length;
+  const pfTotal=teamRow.pf;
   $("mixBox").hidden=!evs.length;
   if(evs.length){
     $("mixBody").innerHTML=(pt?`<div class="mixhd" style="--c:var(--pt)">得分 ${pt}</div>${mix(ptActs,byAct,maxAct,bySub)}`:"")+(er?`<div class="mixhd" style="--c:var(--er)">失誤 ${er}</div>${mix(erActs,byAct,maxAct,bySub)}`:"")
       +(pfTotal?`<div class="mixhd" style="--c:var(--pf)">表現 ${pfTotal}（不計分）</div>${mix(pfActs,byAct,maxAct)}`:"");
     $("mixNote").textContent=(statsFilter==="all"?"全部場次":"這一場")+(statsSet==="all"?"":`・第 ${statsSet} 局`);
   }
-  statSnap={k, list, evs, ms, scs, teamEvs, scope:(statsFilter==="all"?"全部場次":(matchLabel(ms.find(m=>m.id===statsFilter)||{})||"單場"))+(statsSet==="all"?"":`・第${statsSet}局`)};
-  renderViz(k, list, evs, scs, ms, teamEvs);
+  statSnap={k, list, evs, ms, scs, teamEvs, teamRow, scope:(statsFilter==="all"?"全部場次":(matchLabel(ms.find(m=>m.id===statsFilter)||{})||"單場"))+(statsSet==="all"?"":`・第${statsSet}局`)};
+  renderViz(k, list, evs, scs, ms, teamEvs, teamRow);
+  // v19：記錄碼看不到球員表
+  $("statsTable").closest(".tbl-scroll").hidden=!seeP; $("statsTableNote").hidden=!seeP; $("recViewNote").hidden=seeP;
   const t=teamOf(k), maxTot=Math.max(1,...list.map(r=>r.pt+r.er));
   $("statsTable").innerHTML=`<thead><tr><th>隊員</th><th class="n">得分</th><th class="n">失誤</th><th class="n">淨值</th><th class="n" title="發球＋攻擊的得分減失分">進攻</th><th class="n">效率</th></tr></thead><tbody>`+
     (list.length?list.map(r=>{
@@ -2904,9 +2927,9 @@ function renderStats(){
       return `<tr class="row ${zero?"zero":""}" data-row="${esc(r.p.id)}" aria-expanded="${openRow===r.p.id}"><td class="nm"><span class="pl"><i style="background:${t.color}"></i>${esc(r.p.name)}${r.p.no?`<small>#${esc(r.p.no)}</small>`:""}</span>${bar}</td>
         <td class="n">${r.pt}</td><td class="n">${r.er}</td><td class="n ${net>0?"pos":net<0?"neg":""}">${net>0?"+":""}${net}</td><td class="n off ${off>0?"pos":off<0?"neg":""}">${off>0?"+":""}${off}</td><td class="n eff ${ef>0?"pos":ef<0?"neg":""}">${fmtEff(ef)}</td></tr>${det}`;
     }).join(""):`<tr><td colspan="6" style="text-align:center;color:var(--muted)">沒有隊員資料</td></tr>`)+`</tbody>`;
-  const pend=list.reduce((s,r)=>s+r.pending,0);
+  const pend=teamRow.pending;
   $("statsNote").textContent = (pend?` 含這台手機尚未送出的 ${pend} 筆。`:"") + (lastStats?` 伺服器資料更新於 ${hhmm(lastStats)}。`:"");
-  vizAnimate();
+  vizAnimate(); applyHints($("stats"));
 }
 /* ---------- 歷史趨勢：每場得分／失誤折線＋每場平均 ---------- */
 let trendWho="ALL";
@@ -2914,7 +2937,8 @@ function renderTrend(k, ms, teamEvs){
   const box=$("trendBox");
   if(statsFilter!=="all"||statsSet!=="all"){ box.hidden=true; return; }      // 趨勢只在「全部場次・整場」顯示
   const ps=allPlayersOf(k);
-  if(trendWho!=="ALL"&&!ps.some(p=>p.id===trendWho)) trendWho="ALL";
+  if(trendWho!=="ALL"&&(!canSeePlayers()||!ps.some(p=>p.id===trendWho))) trendWho="ALL";
+  $("trendSel").hidden=!canSeePlayers();
   const evs=teamEvs.filter(e=>trendWho==="ALL"||e.player===trendWho);
   const scs=scoresOf(k);
   // 依日期由舊到新
@@ -2932,9 +2956,9 @@ function renderTrend(k, ms, teamEvs){
   const n=pts.length, sum=f=>pts.reduce((a,x)=>a+f(x),0), avg=v=>(v/n).toFixed(1).replace(/\.0$/,"");
   const tp=sum(x=>x.pt), te=sum(x=>x.er), tf=sum(x=>x.pf), dec=pts.filter(x=>x.res), wins=dec.filter(x=>x.res==="W").length;
   const eff=tp+te?Math.round((tp-te)/(tp+te)*100):null;
-  $("avgRow").innerHTML=[["場數",n],["每場得分",avg(tp)],["每場失誤",avg(te)],["每場淨值",(tp-te>0?"+":"")+avg(tp-te)],["整體效率",eff==null?"–":(eff>0?"+":"")+eff+"%"]]
-    .concat(tf?[["每場表現",avg(tf)]]:[]).concat(dec.length?[["場勝率",Math.round(wins/dec.length*100)+"%"]]:[])
-    .map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join("");
+  $("avgRow").innerHTML=[["場數",n,"有紀錄的場次"],["每場得分",avg(tp),"平均每場打下幾分"],["每場失誤",avg(te),"平均每場送對方幾分"],["每場淨值",(tp-te>0?"+":"")+avg(tp-te),"平均每場得分－失誤"],["整體效率",eff==null?"–":(eff>0?"+":"")+eff+"%","所有場次合起來的效率"]]
+    .concat(tf?[["每場表現",avg(tf),"不算分的動作，如到位、救球"]]:[]).concat(dec.length?[["場勝率",Math.round(wins/dec.length*100)+"%",`有比分的 ${dec.length} 場裡贏的比例`]]:[])
+    .map(([a,b,h])=>`<div><small>${a}</small><b>${b}</b>${h?`<button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">${h}</em>`:""}</div>`).join("");
   drawTrend(pts);
 }
 function drawTrend(pts){
@@ -3017,7 +3041,8 @@ function anaRalliesRaw(ms){
 }
 function rallyName(e){
   if(e.opp) return oppKey(e);
-  return ((playerBy(e.player)||{}).name||"")+" "+((actionBy(e.action)||{}).name||e.action);
+  const nm=canSeePlayers()?((playerBy(e.player)||{}).name||""):"";
+  return (nm?nm+" ":"")+((actionBy(e.action)||{}).name||e.action);
 }
 function renderAnalysis(ms){
   const box=$("anaBox"), sets=anaRallies(ms); anaDraw=null;
@@ -3047,7 +3072,7 @@ function anaFlow(sets){
   const opts=sets.map(x=>`<option value="${esc(x.m.id+"|"+x.set)}" ${x===cur?"selected":""}>${esc((matchLabel(x.m)||"未命名場次")+"・第 "+x.set+" 局")}</option>`).join("");
   anaDraw=()=>drawFlow(pts);
   return `${sets.length>1?`<select class="inp" id="anaSetSel" aria-label="選擇局">${opts}</select>`:`<p class="lead">${esc((matchLabel(cur.m)||"未命名場次")+"・第 "+cur.set+" 局")}</p>`}
-    <div class="avg"><div><small>比分</small><b>${u}:${t}</b></div><div><small>最長連得</small><b>${bestU}</b></div><div><small>最長連失</small><b>${bestT}</b></div><div><small>最大領先</small><b>${lead>0?"+"+lead:0}</b></div><div><small>最大落後</small><b>${trail<0?trail:0}</b></div><div><small>平手次數</small><b>${ties}</b></div></div>
+    <div class="avg"><div><small>比分</small><b>${u}:${t}</b></div><div><small>最長連得</small><b>${bestU}</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">我方最多連續拿下幾分</em></div><div><small>最長連失</small><b>${bestT}</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">對方最多連續拿下幾分</em></div><div><small>最大領先</small><b>${lead>0?"+"+lead:0}</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">我方最多領先幾分</em></div><div><small>最大落後</small><b>${trail<0?trail:0}</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">我方最多落後幾分</em></div><div><small>平手次數</small><b>${ties}</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">比分打平的次數，越多越膠著</em></div></div>
     <div class="legend"><span><i style="background:var(--c-pt)"></i>我方</span><span><i style="background:var(--c-er)"></i>對方</span></div>
     <div class="ana-chart" id="anaChart"></div>
     ${cur.opp?"":`<p class="lead" style="margin-top:8px">這一局沒有記對方得失分，對方的分數只算到我方失誤。</p>`}`;
@@ -3123,16 +3148,16 @@ function anaSrv(all){
   const rw=rec.filter(r=>r.won).length, sw=srv.filter(r=>r.won).length;
   const by={}; srv.forEach(r=>{ if(!r.srv) return; const x=by[r.srv]=by[r.srv]||{n:0,w:0,ace:0,err:0}; x.n++; if(r.won) x.w++;
     if(r.e.player===r.srv&&r.e.action==="ACE") x.ace++; if(r.e.player===r.srv&&r.e.action==="SERR") x.err++; });
-  const ids=Object.keys(by).sort((a,b)=>by[b].n-by[a].n);
+  const ids=canSeePlayers()?Object.keys(by).sort((a,b)=>by[b].n-by[a].n):[];
   const bar=(w,n,c)=>`<div class="stack" style="margin:2px 0 0"><i style="width:${n?w/n*100:0}%;background:${c}"></i></div>`;
   return `<div class="avg">
-      <div><small>接發得分率</small><b>${rec.length?pct(rw,rec.length)+"%":"–"}</b>${bar(rw,rec.length,"var(--c-pt)")}<small style="margin-top:4px">對方發球 ${rec.length} 球・拿下 ${rw}</small></div>
-      <div><small>發球局得分率</small><b>${srv.length?pct(sw,srv.length)+"%":"–"}</b>${bar(sw,srv.length,"var(--c-pt)")}<small style="margin-top:4px">我方發球 ${srv.length} 球・拿下 ${sw}</small></div></div>
+      <div><small>接發得分率</small><b>${rec.length?pct(rw,rec.length)+"%":"–"}</b>${bar(rw,rec.length,"var(--c-pt)")}<small style="margin-top:4px">對方發球 ${rec.length} 球・拿下 ${rw}</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">對方發球時，我方拿下這球的比例</em></div>
+      <div><small>發球局得分率</small><b>${srv.length?pct(sw,srv.length)+"%":"–"}</b>${bar(sw,srv.length,"var(--c-pt)")}<small style="margin-top:4px">我方發球 ${srv.length} 球・拿下 ${sw}</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">我方發球時，拿下這球的比例</em></div></div>
     <p class="lead"><b>接發得分率</b>越高，代表對方發球時我們越能一次拿回發球權；<b>發球局得分率</b>越高，代表我們發球時越能連續得分。</p>
     ${ids.length?`<div class="mixhd" style="--c:var(--c-pt)">每位發球者</div>
     <table class="mini"><thead><tr><th>發球者</th><th class="n">發球局</th><th class="n">拿下</th><th class="n">得分率</th><th class="n">發球得分</th><th class="n">發球失誤</th></tr></thead><tbody>
     ${ids.map(id=>{ const x=by[id], p=playerBy(id)||{name:"?"}; return `<tr><td>${esc(p.name)}</td><td class="n">${x.n}</td><td class="n">${x.w}</td><td class="n">${pct(x.w,x.n)}%</td><td class="n">${x.ace}</td><td class="n">${x.err}</td></tr>`; }).join("")}</tbody></table>`
-    :`<p class="lead">開啟站位輪轉後，會再列出每位發球者的數據。</p>`}`;
+    :canSeePlayers()?`<p class="lead">開啟站位輪轉後，會再列出每位發球者的數據。</p>`:""}`;
 }
 
 /* ---------- 技術結構（v8）：依六大技術分類得失分，參考〈排球競賽即時記錄與分析之應用程式〉（陳思宇，2018） ---------- */
@@ -3193,6 +3218,13 @@ function vizAnimate(){
 }
 // 數據頁裡的分頁、場次、局數按鈕和下拉選單 → 下一次重畫播放動畫（捕獲階段，比原本的處理先執行）
 $("stats").addEventListener("click",e=>{ if(e.target.closest("button[data-a],button[data-v],button[data-f],button[data-s]")) animNext=true; },true);
+/* v20：數字說明的「?」：點了才展開；背景同步重畫後仍保持展開（以說明文字記住） */
+const openHints=new Set();
+function applyHints(root){ (root||document).querySelectorAll(".hint-q").forEach(b=>{ const t=b.parentElement, h=t.querySelector(".hint"), on=!!h&&openHints.has(h.textContent);
+  t.classList.toggle("hint-open",on); b.setAttribute("aria-expanded",on); }); }
+document.addEventListener("click",e=>{ const b=e.target.closest(".hint-q"); if(!b) return; e.stopPropagation();
+  const h=b.parentElement.querySelector(".hint"); if(!h) return; const k=h.textContent;
+  if(openHints.has(k)) openHints.delete(k); else openHints.add(k); applyHints(); });
 $("stats").addEventListener("change",e=>{ if(e.target.matches("select")) animNext=true; },true);
 
 /* ====================== v12：團隊圖表、個人圖表 ======================
@@ -3211,10 +3243,21 @@ function vizData(list, evs){
       rcvN:c("RGOOD")+c("RBAD")+c("RERR"), rcvG:c("RGOOD"), rcvB:c("RBAD"), rcvE:c("RERR")};
   });
 }
-function renderViz(k, list, evs, scs, ms, teamEvs){
-  const ps=vizData(list, evs), tv=$("tvBox"), pv=$("pvBox");
-  vizDraw={}; tv.hidden=pv.hidden=!ps.length;
+const PER_PLAYER_TV=["contrib","quad","heat"];     // v19：逐人列出的團隊圖表，記錄碼看不到
+function renderViz(k, list, evs, scs, ms, teamEvs, teamRow){
+  const seeP=canSeePlayers(), ps=seeP?vizData(list, evs):[], tv=$("tvBox"), pv=$("pvBox");
+  vizDraw={}; tv.hidden=seeP?!ps.length:!evs.length; pv.hidden=!ps.length;
   [tv,pv].forEach(b=>{ const t=b.querySelector(".tip"); if(t) t.hidden=true; });
+  document.querySelectorAll("#tvTabs [data-v]").forEach(b=>b.hidden=!seeP&&PER_PLAYER_TV.includes(b.dataset.v));
+  if(!seeP){
+    if(PER_PLAYER_TV.includes(tvTab)) tvTab="phase";
+    if(!evs.length) return;
+    $("tvNote").textContent=(statsFilter==="all"?"全部場次":"這一場")+(statsSet==="all"?"":`・第 ${statsSet} 局`)+"・全隊";
+    document.querySelectorAll("#tvTabs [data-v]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===tvTab));
+    $("tvBody").innerHTML = tvTab==="phase"?tvPhase(ms) : tvTab==="rate"?tvRate(vizData([teamRow],evs),true) : tvWL(ms,scs,teamEvs);
+    Object.values(vizDraw).forEach(f=>f());
+    return;
+  }
   if(!ps.length) return;
   $("tvNote").textContent=(statsFilter==="all"?"全部場次":"這一場")+(statsSet==="all"?"":`・第 ${statsSet} 局`)+`・${ps.length} 位`;
   document.querySelectorAll("#tvTabs [data-v]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===tvTab));
@@ -3262,22 +3305,22 @@ function rateData(ps){
   return {att:sum("att"),atkN:sum("atkN"),atkK:sum("atkK"),atkE:sum("atkE"),rcvN:sum("rcvN"),rcvG:sum("rcvG"),rcvB:sum("rcvB"),rcvE:sum("rcvE"),hasRG:sum("rcvG")>0};
 }
 const ratePct=(a,n)=>n?Math.round(a/n*100):null;
-function tvRate(ps){
+function tvRate(ps, teamOnly){
   const T=rateData(ps), hasA=T.att>0, hasR=T.hasRG;
-  if(!hasA&&!hasR) return `<div class="empty">到「隊伍」分頁打開<b>詳細模式</b>，記錄時多記「一般攻擊」（攻擊了但沒得分也沒失誤）和「接發到位」，這裡就會算出每個人的攻擊成功率和一傳到位率。</div>`;
+  if(!hasA&&!hasR) return `<div class="empty">到「隊伍」分頁打開<b>詳細模式</b>，記錄時多記「一般攻擊」（攻擊了但沒得分也沒失誤）和「接發到位」，這裡就會算出${teamOnly?"全隊":"每個人"}的攻擊成功率和一傳到位率。</div>`;
   const pc=v=>v==null?"–":v+"%", eff=(k,e,n)=>n?sgn(Math.round((k-e)/n*100))+"%":"–";
   const bar=(v,c)=>`<div class="stack" style="margin:4px 0 0"><i style="width:${v||0}%;background:${c}"></i></div>`;
   const tiles=[];
-  if(hasA) tiles.push(`<div><small>攻擊成功率</small><b>${pc(ratePct(T.atkK,T.atkN))}</b>${bar(ratePct(T.atkK,T.atkN),"var(--c-pt)")}<small style="margin-top:4px">攻擊 ${T.atkN} 次・得分 ${T.atkK}</small></div>`,
-    `<div><small>攻擊效率</small><b>${eff(T.atkK,T.atkE,T.atkN)}</b><small style="margin-top:4px">（得分－失誤－被攔）÷ 次數</small></div>`);
-  if(hasR) tiles.push(`<div><small>一傳到位率</small><b>${pc(ratePct(T.rcvG,T.rcvN))}</b>${bar(ratePct(T.rcvG,T.rcvN),"var(--c-pt)")}<small style="margin-top:4px">接發 ${T.rcvN} 次・到位 ${T.rcvG}</small></div>`);
-  const rows=ps.filter(x=>(hasA&&x.atkN)||(hasR&&x.rcvN)).sort((a,b)=>(b.atkN+b.rcvN)-(a.atkN+a.rcvN));
-  const atkBest=ps.filter(x=>x.atkN>=5).sort((a,b)=>b.atkK/b.atkN-a.atkK/a.atkN)[0], rcvBest=ps.filter(x=>x.rcvN>=5).sort((a,b)=>b.rcvG/b.rcvN-a.rcvG/a.rcvN)[0];
+  if(hasA) tiles.push(`<div><small>攻擊成功率</small><b>${pc(ratePct(T.atkK,T.atkN))}</b>${bar(ratePct(T.atkK,T.atkN),"var(--c-pt)")}<small style="margin-top:4px">攻擊 ${T.atkN} 次・得分 ${T.atkK}</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">攻擊直接得分的比例</em></div>`,
+    `<div><small>攻擊效率</small><b>${eff(T.atkK,T.atkE,T.atkN)}</b><small style="margin-top:4px">（得分－失誤－被攔）÷ 次數</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">扣掉失誤後的攻擊貢獻，正數才划算</em></div>`);
+  if(hasR) tiles.push(`<div><small>一傳到位率</small><b>${pc(ratePct(T.rcvG,T.rcvN))}</b>${bar(ratePct(T.rcvG,T.rcvN),"var(--c-pt)")}<small style="margin-top:4px">接發 ${T.rcvN} 次・到位 ${T.rcvG}</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">一傳讓舉球員好舉的比例</em></div>`);
+  const rows=teamOnly?[]:ps.filter(x=>(hasA&&x.atkN)||(hasR&&x.rcvN)).sort((a,b)=>(b.atkN+b.rcvN)-(a.atkN+a.rcvN));
+  const atkBest=teamOnly?null:ps.filter(x=>x.atkN>=5).sort((a,b)=>b.atkK/b.atkN-a.atkK/a.atkN)[0], rcvBest=teamOnly?null:ps.filter(x=>x.rcvN>=5).sort((a,b)=>b.rcvG/b.rcvN-a.rcvG/a.rcvN)[0];
   const lead=[atkBest&&hasA?`攻擊成功率最高：<b>${esc(atkBest.p.name)}</b>（${pc(ratePct(atkBest.atkK,atkBest.atkN))}）`:"", rcvBest&&hasR?`一傳最穩：<b>${esc(rcvBest.p.name)}</b>（${pc(ratePct(rcvBest.rcvG,rcvBest.rcvN))}）`:""].filter(Boolean).join("；");
   return `<div class="avg">${tiles.join("")}</div>
     <p class="lead">${lead?lead+"（5 次以上才列入）。":""}攻擊成功率＝殺球＋吊球 ÷ 攻擊總數；一傳到位率＝接發到位 ÷（到位＋未到位＋接發失誤）。</p>
-    <table class="mini"><thead><tr><th>隊員</th>${hasA?`<th class="n">攻擊</th><th class="n">成功率</th><th class="n">效率</th>`:""}${hasR?`<th class="n">接發</th><th class="n">到位率</th>`:""}</tr></thead><tbody>
-    ${rows.map(x=>`<tr><td>${esc(x.p.name)}</td>${hasA?`<td class="n">${x.atkN}</td><td class="n">${pc(ratePct(x.atkK,x.atkN))}</td><td class="n">${eff(x.atkK,x.atkE,x.atkN)}</td>`:""}${hasR?`<td class="n">${x.rcvN}</td><td class="n">${pc(ratePct(x.rcvG,x.rcvN))}</td>`:""}</tr>`).join("")}</tbody></table>
+    ${teamOnly?"":`<table class="mini"><thead><tr><th>隊員</th>${hasA?`<th class="n">攻擊</th><th class="n">成功率</th><th class="n">效率</th>`:""}${hasR?`<th class="n">接發</th><th class="n">到位率</th>`:""}</tr></thead><tbody>
+    ${rows.map(x=>`<tr><td>${esc(x.p.name)}</td>${hasA?`<td class="n">${x.atkN}</td><td class="n">${pc(ratePct(x.atkK,x.atkN))}</td><td class="n">${eff(x.atkK,x.atkE,x.atkN)}</td>`:""}${hasR?`<td class="n">${x.rcvN}</td><td class="n">${pc(ratePct(x.rcvG,x.rcvN))}</td>`:""}</tr>`).join("")}</tbody></table>`}
     <p class="lead" style="margin-top:8px">${!hasA?"還沒有記「一般攻擊」，所以攻擊成功率先不算（只記到有結果的攻擊，比例會偏高）。":!hasR?"還沒有記「接發到位」，所以一傳到位率先不算。":"要整場都記才準；只記一部分的話，數字會偏高或偏低。"}</p>`;
 }
 
@@ -3352,8 +3395,8 @@ function tvPhase(ms){
   const mx=Math.max(1,...P.map(p=>Math.max(p.w,p.l))), ok=P.filter(p=>p.w+p.l>=3);
   const worst=ok.slice().sort((a,b)=>a.w/(a.w+a.l)-b.w/(b.w+b.l))[0], best=ok.slice().sort((a,b)=>b.w/(b.w+b.l)-a.w/(a.w+a.l))[0];
   const k3=P[3], lk=topOf(lostKey).slice(0,3);
-  return `<div class="avg"><div><small>關鍵分得分率</small><b>${k3.w+k3.l?pct(k3.w,k3.w+k3.l)+"%":"–"}</b><small>${k3.w+k3.l} 球</small></div>
-      <div><small>連得 3 分以上</small><b>${r3u} 次</b><small>最長 ${mu} 分</small></div><div><small>連失 3 分以上</small><b>${r3t} 次</b><small>最長 ${mt} 分</small></div></div>
+  return `<div class="avg"><div><small>關鍵分得分率</small><b>${k3.w+k3.l?pct(k3.w,k3.w+k3.l)+"%":"–"}</b><small>${k3.w+k3.l} 球</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">局末關鍵球我方拿下的比例</em></div>
+      <div><small>連得 3 分以上</small><b>${r3u} 次</b><small>最長 ${mu} 分</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">打出氣勢的次數，越多越好</em></div><div><small>連失 3 分以上</small><b>${r3t} 次</b><small>最長 ${mt} 分</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">被對方連續得分的次數，越少越好</em></div></div>
     <p class="lead">依這一球開打前<b>領先方的分數</b>分段：開局 0～7、中盤 8～15、後段 16～19、關鍵分 20 以上（決勝局 0～4／5～9／10～11／12 以上）。${ok.length>1&&worst!==best?`最強：<b>${best.n}</b>；最弱：<b>${worst.n}</b>。`:""}</p>
     <div class="divhd wide"><span></span><span><span>← 失分</span><span>得分 →</span></span><span style="text-align:right">得分率</span></div>
     ${P.map(p=>{ const n=p.w+p.l, r=pct(p.w,n); return `<div class="divrow wide"${tipA(`<b>${p.n}</b>・${n} 球<br>得 ${p.w}・失 ${p.l}${n?`・得分率 ${r}%`:""}`)}><span class="lb">${p.n}<span class="sub">${n} 球</span></span>
@@ -3380,7 +3423,7 @@ function tvWL(ms,scs,teamEvs){
   const mx=Math.max(.5,...rows.map(r=>Math.max(r.w,r.l)));
   const sc=a=>`${f1(a.reduce((s,x)=>s+x.us,0)/a.length)}:${f1(a.reduce((s,x)=>s+x.them,0)/a.length)}`;
   const gapE=rows.filter(r=>r.kind==="er").sort((a,b)=>(b.l-b.w)-(a.l-a.w))[0], gapP=rows.filter(r=>r.kind==="pt"&&r.n!=="對方送分").sort((a,b)=>(b.w-b.l)-(a.w-a.l))[0];
-  return `<div class="avg"><div><small>贏的局</small><b>${won.length} 局</b><small>平均 ${sc(won)}</small></div><div><small>輸的局</small><b>${lost.length} 局</b><small>平均 ${sc(lost)}</small></div></div>
+  return `<div class="avg"><div><small>贏的局</small><b>${won.length} 局</b><small>平均 ${sc(won)}</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">贏的局平均比分</em></div><div><small>輸的局</small><b>${lost.length} 局</b><small>平均 ${sc(lost)}</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">輸的局平均比分</em></div></div>
     <p class="lead">${gapE&&gapE.l-gapE.w>=.5?`輸的局平均每局多了 <b>${f1(gapE.l-gapE.w)} 次${esc(gapE.n)}</b>`:"贏局和輸局的失誤差不多"}${gapP&&gapP.w-gapP.l>=.5?`；贏的局平均多 <b>${f1(gapP.w-gapP.l)} 分${esc(gapP.n)}</b>`:""}。</p>
     <div class="legend"><span><i style="background:var(--c-pt)"></i>贏的局（每局平均）</span><span><i style="background:var(--c-er)"></i>輸的局</span></div>
     ${rows.map(r=>`<div class="cmprow wl"${tipA(`<b>${esc(r.n)}</b>${r.sub?"（"+esc(r.sub)+"）":""}<br>贏的局每局 ${f1(r.w)}・輸的局每局 ${f1(r.l)}`)}><span class="lb">${esc(r.n)}${r.sub?`<span class="sub" style="display:block;font-size:10px;color:var(--muted);font-weight:400">${esc(r.sub)}</span>`:""}</span>
@@ -3427,7 +3470,7 @@ function pvCmp(me,ps,scs,teamEvs){
   const wr=o=>o.n?pct(o.w,o.n)+"%":"–";
   return `<div class="legend"><span><i style="background:var(--c-pt)"></i>${esc(me.p.name)}</span><span><i style="background:var(--muted);opacity:.55"></i>全隊平均</span></div>
     ${rows}
-    ${on.n||off.n?`<div class="avg" style="margin-top:12px"><div><small>他在場的局・勝率</small><b>${wr(on)}</b><small>${on.n} 局贏 ${on.w}</small></div><div><small>他不在場的局・勝率</small><b>${wr(off)}</b><small>${off.n?off.n+" 局贏 "+off.w:"每局都有上場"}</small></div></div>
+    ${on.n||off.n?`<div class="avg" style="margin-top:12px"><div><small>他在場的局・勝率</small><b>${wr(on)}</b><small>${on.n} 局贏 ${on.w}</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">他上場的局，全隊贏的比例</em></div><div><small>他不在場的局・勝率</small><b>${wr(off)}</b><small>${off.n?off.n+" 局贏 "+off.w:"每局都有上場"}</small><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">比在場的低，代表他上場有幫助</em></div></div>
     <p class="lead">在場與不在場的勝率差，可以粗略看出這位隊員對比賽結果的影響（局數少時參考就好）。</p>`:`<p class="lead" style="margin-top:10px">輸入局比分後，這裡會多出「他在場／不在場」的局勝率。</p>`}`;
 }
 
@@ -3606,19 +3649,20 @@ function openSetReport(mid, set, thenLineup){
   const by={}; rs.forEach(r=>{ if(r.e.opp||!r.e.player) return; const x=by[r.e.player]=by[r.e.player]||{net:0,err:{},pt:{}};
     const nm=(actionBy(r.e.action)||{}).name||r.e.action; if(r.won){ x.net++; x.pt[nm]=(x.pt[nm]||0)+1; } else { x.net--; x.err[nm]=(x.err[nm]||0)+1; } });
   const ids=Object.keys(by).sort((a,b)=>by[b].net-by[a].net);
-  const best=ids.length&&by[ids[0]].net>0?ids[0]:null, warn=ids.length&&by[ids[ids.length-1]].net<0?ids[ids.length-1]:null;
+  const seeP=canSeePlayers(), best=seeP&&ids.length&&by[ids[0]].net>0?ids[0]:null, warn=seeP&&ids.length&&by[ids[ids.length-1]].net<0?ids[ids.length-1]:null;
   const desc=map=>topOf(map).slice(0,2).map(([k,v])=>`${esc(k)} ${v}`).join("、");
   const list=(map,total,c)=>topOf(map).slice(0,3).map(([k,v])=>`<div class="leg"><i style="background:${c}"></i><span>${esc(k)}</span><span class="n">${v}</span><span class="pc">${pct(v,total)}%</span></div>`).join("");
   const us=sc?sc.us:nu, them=sc?sc.them:nt;
   $("repTitle").textContent=`第 ${set} 局報告`;
   $("repSub").textContent=`${matchLabel(m)||"未命名場次"}・${us}:${them}${us>them?" 勝":us<them?" 負":""}`;
-  $("repBody").innerHTML=`<div class="avg" style="margin-top:12px"><div><small>接發得分率</small><b>${rec.length?pct(rw,rec.length)+"%":"–"}</b></div><div><small>最長連得</small><b>${bu}</b></div><div><small>最長連失</small><b>${bt}</b></div></div>
+  $("repBody").innerHTML=`<div class="avg" style="margin-top:12px"><div><small>接發得分率</small><b>${rec.length?pct(rw,rec.length)+"%":"–"}</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">對方發球時我方拿下的比例</em></div><div><small>最長連得</small><b>${bu}</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">我方最多連續拿下幾分</em></div><div><small>最長連失</small><b>${bt}</b><button type="button" class="hint-q" aria-label="這是什麼？" aria-expanded="false">?</button><em class="hint">對方最多連續拿下幾分</em></div></div>
     ${nu?`<div class="mixhd" style="--c:var(--c-pt)">主要得分</div>${list(pt,nu,"var(--c-pt)")}`:""}
     ${nt?`<div class="mixhd" style="--c:var(--c-er)">主要失分</div>${list(er,nt,"var(--c-er)")}`:""}
     ${best?`<p class="rep-p">👍 表現最好：<b>${esc((playerBy(best)||{}).name||"")}</b> ${by[best].net>0?"+":""}${by[best].net}（${desc(by[best].pt)}）</p>`:""}
     ${warn&&warn!==best?`<p class="rep-p">⚠ 需要提醒：<b>${esc((playerBy(warn)||{}).name||"")}</b> ${by[warn].net}（${desc(by[warn].err)}）</p>`:""}
     ${(()=>{ const o=oppTop(rs.filter(r=>realOpp(r.e)&&!r.won))[0]; return o?`<p class="rep-p">🎯 對方得分最多：<b>#${esc(o[0])}</b> ${o[1].n} 分（${desc(o[1].a)}）</p>`:""; })()}
     ${rs.some(r=>realOpp(r.e))?"":`<p class="note">這局沒有記對方得失分，對方的分數只算到我方失誤。</p>`}`;
+  applyHints($("repBody"));
   const d=$("repDlg"); d.dataset.next=thenLineup?"1":""; d.dataset.m=mid; d.dataset.s=set;
   $("repOk").textContent=thenLineup?"排下一局先發":"繼續";
   d.showModal();
@@ -3638,6 +3682,8 @@ function exportCsv(kind){
   if(!statSnap) return;
   const {k,list,evs,ms,scope}=statSnap, team=teamOf(k).name, acts=actions();
   const safe=(team+"_"+scope).replace(/[\\/:*?"<>|\s]+/g,"_");
+  const seeP=canSeePlayers();
+  if(kind==="sum"&&!seeP) return;
   if(kind==="sum"){
     // v16：有記細分的動作，多出「動作・細分」欄
     const subCols=[]; acts.forEach(a=>subsOf(a).forEach(n=>{ if(list.some(r=>r.sub&&r.sub[a.code]&&r.sub[a.code][n])) subCols.push([a.code,n,a.name+"・"+n]); }));
@@ -3657,26 +3703,27 @@ function exportCsv(kind){
       if(!list.length&&!ns.length) continue;
       const ann={}; rally(m.id,set,ann);
       list.concat(ns.map(n=>Object.assign({noteRow:true},n))).sort((a,b)=>(a.t||0)-(b.t||0)).forEach(e=>{
-        if(e.noteRow){ const p=playerBy(e.player)||{}, sc=e.sc||{};
+        if(e.noteRow){ const p=seeP&&playerBy(e.player)||{}, sc=e.sc||{};
           rows.push([m.date||"",m.opponent||"",m.title||"",set,e.t?hhmm(e.t):"",p.name||"",p.no||"","筆記","筆記","",sc.us==null?"":sc.us,sc.them==null?"":sc.them,"","","",e.text]); return; }
-        const x=ann[e.id]||{}, p=playerBy(e.player)||{}, a=actionBy(e.action)||{name:e.action};
+        const x=ann[e.id]||{}, p=seeP&&playerBy(e.player)||{}, a=actionBy(e.action)||{name:e.action};
         const name=e.opp?oppLabel(e).replace(/ #\d+/,""):a.name, cat=e.opp?(isAdj(e)?"修正":"對方"):e.cat, sub=e.opp?"":(e.sub||"");
         const val=e.opp?(e.opp==="pt"?1:-1):e.cat==="表現"?0:(e.cat==="失誤"?-1:1)*(Number(e.value)||1);
         rows.push([m.date||"",m.opponent||"",m.title||"",set,e.t?hhmm(e.t):"",e.opp?(e.oppNo?"對方":""):(p.name||""),e.opp?(e.oppNo||""):(p.no||""),name,cat,val,
-          x.us==null?"":x.us,x.them==null?"":x.them,x.serve==="us"?"我方":x.serve==="them"?"對方":"",x.rot||"",x.slot||"","",sub]);
+          x.us==null?"":x.us,x.them==null?"":x.them,x.serve==="us"?"我方":x.serve==="them"?"對方":"",x.rot||"",seeP?(x.slot||""):"","",sub]);
       });
     } });
     downloadCsv(`逐筆紀錄_${safe}.csv`,[["日期","對手","場次名稱","局","時間","隊員","背號","動作","類別","我方得失","我方比分","對方比分","發球方","輪轉","站位","筆記內容","細分"]].concat(rows));
   }
   showToast("已匯出 CSV");
 }
-$("csvBtn").addEventListener("click",()=>{ if(!statSnap) return; $("csvScope").textContent=`${teamOf(statSnap.k).name}・${statSnap.scope}（${statSnap.evs.length} 筆紀錄）`; $("csvDlg").showModal(); });
+$("csvBtn").addEventListener("click",()=>{ if(!statSnap) return; $("csvSum").hidden=!canSeePlayers(); $("csvRawSmall").textContent=canSeePlayers()?"每一球一列：時間、隊員、動作、當下比分、發球方、輪轉、站位，加上比賽筆記（含對方得失分，適合丟給 AI 分析）":"每一球一列：時間、動作、當下比分、發球方、輪轉，加上比賽筆記（記錄碼不含隊員欄）"; $("csvScope").textContent=`${teamOf(statSnap.k).name}・${statSnap.scope}（${statSnap.evs.length} 筆紀錄）`; $("csvDlg").showModal(); });
 $("csvDlg").addEventListener("click",e=>{ const b=e.target.closest("[data-csv]"); if(!b) return; exportCsv(b.dataset.csv); $("csvDlg").close(); });
 $("csvClose").addEventListener("click",()=>$("csvDlg").close());
 /* ---------- v13：AI 分析匯出（把每張圖背後的數字整理成純文字，貼給 Claude／ChatGPT 分析） ---------- */
 function aiReport(o){
   anaMemo=null;
-  const {k,list,evs,ms,scs,teamEvs,scope}=statSnap, team=teamOf(k).name, ps=vizData(list,evs);
+  const {k,list,evs,ms,scs,teamEvs,teamRow,scope}=statSnap, team=teamOf(k).name, seeP=canSeePlayers(), ps=seeP?vizData(list,evs):[];
+  if(!seeP){ o.focus=""; o.anon=true; }        // v19：記錄碼只匯出全隊數據
   const inScope=ms.filter(m=>statsFilter==="all"||m.id===statsFilter);
   const alias={}; ps.forEach((x,i)=>alias[x.p.id]=o.anon?(x.p.no?"#"+x.p.no:"隊員"+(i+1)):x.p.name);
   const nm=id=>alias[id]||((playerBy(id)||{}).name?(o.anon?"隊員":playerBy(id).name):"?");
@@ -3688,7 +3735,7 @@ function aiReport(o){
     `你是排球教練兼數據分析師。以下是業餘混合排球隊「${team}」的比賽紀錄，由「混排球員數據」App 匯出。請用繁體中文回答：`,
     `1. 用 3～5 句總結整體表現`,
     `2. 列出 3 個優勢、3 個最需要改進的地方，每點都引用下面的數字佐證`,
-    focus?`3. 針對「${alias[focus.p.id]}」詳細分析：強項、弱點、和全隊比較、上場對勝負的影響，並給 3 個具體改進建議`:`3. 給每位隊員 1～2 點具體建議`,
+    !seeP?`3. 給全隊 3 點具體建議（這份資料只有全隊合計，沒有個人數據）`:focus?`3. 針對「${alias[focus.p.id]}」詳細分析：強項、弱點、和全隊比較、上場對勝負的影響，並給 3 個具體改進建議`:`3. 給每位隊員 1～2 點具體建議`,
     `4. 建議下一場的戰術調整（站位輪轉、發球策略、接發安排）`,
     `5. 設計一份 60 分鐘的團隊練習菜單，對應最需要改進的項目`,
     `注意：樣本太少的數字（例如少於 10 球或少於 3 局）請說明僅供參考；資料若有缺漏或矛盾也請指出。`,``,
@@ -3706,7 +3753,7 @@ function aiReport(o){
     return `- ${matchLabel(m)||"未命名場次"}：${ss.map(x=>`第${x.set}局 ${x.us}:${x.them}`).join("、")}（${w}:${l}${w>l?" 勝":w<l?" 負":""}）`; });
   if(res.length) L.push(``,`## 比賽結果（局比分）`,...res);
   // 全隊
-  const tp=ps.reduce((a,x)=>a+x.pt,0), te=ps.reduce((a,x)=>a+x.er,0), tf=ps.reduce((a,x)=>a+x.pf,0);
+  const tp=teamRow.pt, te=teamRow.er, tf=teamRow.pf;
   L.push(``,`## 全隊總計`,`- 得分 ${tp}、失誤 ${te}、淨值 ${sgn(tp-te)}、效率 ${tp+te?sgn(Math.round((tp-te)/(tp+te)*100))+"%":"–"}、表現類 ${tf} 次`);
   const all=[].concat(...anaRallies(ms).map(x=>x.rs));
   if(all.length){
@@ -3718,14 +3765,15 @@ function aiReport(o){
       `- 技術結構（我方得分）：${top(sk.pt,8)}`,`- 技術結構（我方失分）：${top(sk.er,8)}`);
     if(!all.some(r=>realOpp(r.e))) L.push(`- ⚠ 沒有記對方得失分，對方的分數只算到我方失誤`);
   }
-  // 隊員表
+  // 隊員表（記錄碼改列全隊動作次數）
   const per=v=>f1(v);
-  L.push(``,`## 隊員數據（依淨值排序）`,`| 隊員 | 位置 | 上場局 | 得分 | 失誤 | 淨值 | 效率 | 進攻 | 每局得分 | 每局失誤 | 表現 |`,`|---|---|---|---|---|---|---|---|---|---|---|`,
+  if(!seeP){ const by={}; Object.keys(teamRow.by).forEach(c=>by[actName(c)]=teamRow.by[c]); L.push(``,`## 全隊動作次數`,`- ${top(by,30)}`); }
+  if(seeP) L.push(``,`## 隊員數據（依淨值排序）`,`| 隊員 | 位置 | 上場局 | 得分 | 失誤 | 淨值 | 效率 | 進攻 | 每局得分 | 每局失誤 | 表現 |`,`|---|---|---|---|---|---|---|---|---|---|---|`,
     ...ps.slice().sort((a,b)=>b.net-a.net).map(x=>`| ${alias[x.p.id]} | ${x.p.pos||"–"} | ${x.sp} | ${x.pt} | ${x.er} | ${sgn(x.net)} | ${x.eff==null?"–":sgn(Math.round(x.eff))+"%"} | ${sgn(x.off)} | ${per(x.pt/x.sp)} | ${per(x.er/x.sp)} | ${x.pf} |`));
-  L.push(``,`## 各隊員動作次數`,...ps.map(x=>{ const by={}; Object.keys(x.r.by).forEach(c=>by[actName(c)]=x.r.by[c]); return `- ${alias[x.p.id]}：${top(by,30)}`; }));
+  if(seeP) L.push(``,`## 各隊員動作次數`,...ps.map(x=>{ const by={}; Object.keys(x.r.by).forEach(c=>by[actName(c)]=x.r.by[c]); return `- ${alias[x.p.id]}：${top(by,30)}`; }));
   // v16：得分方式／失誤原因（細分）
   const sb=[]; actions().forEach(a=>{ if(!subsOf(a).length) return; const m={}; let any=0;
-    ps.forEach(x=>{ const y=x.r.sub&&x.r.sub[a.code]; if(!y) return; Object.keys(y).forEach(n=>{ m[n||"未分"]=(m[n||"未分"]||0)+y[n]; if(n) any++; }); });
+    const y=teamRow.sub&&teamRow.sub[a.code]; if(y) Object.keys(y).forEach(n=>{ m[n||"未分"]=(m[n||"未分"]||0)+y[n]; if(n) any++; });
     if(any) sb.push(`- ${a.name}（${a.cat}）：${top(m,10)}`); });
   if(sb.length){ L.push(``,`## 得分方式與失誤原因（細分）`,...sb);
     const who=[]; ps.forEach(x=>{ const parts=[]; Object.keys(x.r.sub||{}).forEach(c=>Object.keys(x.r.sub[c]).forEach(n=>{ if(n) parts.push([actName(c)+"・"+n,x.r.sub[c][n]]); }));
@@ -3735,7 +3783,7 @@ function aiReport(o){
   const wr=ps.filter(x=>x.r.sets).map(x=>`- ${alias[x.p.id]}：上場 ${x.r.sets} 局贏 ${x.r.wins}（${P(x.r.wins,x.r.sets)}）`);
   if(wr.length) L.push(``,`## 隊員上場局勝率`,...wr);
   // v17：攻擊成功率、一傳到位率（有開詳細模式才有）
-  const RT=rateData(ps);
+  const RT=rateData(vizData([teamRow],evs));
   if(RT.att||RT.hasRG){ L.push(``,`## 攻擊成功率與一傳到位率（詳細模式）`);
     if(RT.att) L.push(`- 全隊攻擊 ${RT.atkN} 次、得分 ${RT.atkK}、失誤＋被攔 ${RT.atkE}：成功率 ${P(RT.atkK,RT.atkN)}、效率 ${RT.atkN?sgn(Math.round((RT.atkK-RT.atkE)/RT.atkN*100))+"%":"–"}`);
     if(RT.hasRG) L.push(`- 全隊接發 ${RT.rcvN} 次：到位 ${RT.rcvG}、未到位 ${RT.rcvB}、失誤 ${RT.rcvE}（到位率 ${P(RT.rcvG,RT.rcvN)}）`);
@@ -3757,7 +3805,7 @@ function aiReport(o){
   if(sv.length){ const rec=sv.filter(r=>r.serve==="them"), srv=sv.filter(r=>r.serve==="us"), by={};
     srv.forEach(r=>{ if(!r.srv) return; const x=by[r.srv]=by[r.srv]||{n:0,w:0}; x.n++; if(r.won) x.w++; });
     L.push(``,`## 發球／接發`,`- 接發得分率（對方發球時拿下）：${P(rec.filter(r=>r.won).length,rec.length)}（${rec.length} 球）`,`- 發球局得分率（我方發球時拿下）：${P(srv.filter(r=>r.won).length,srv.length)}（${srv.length} 球）`,
-      ...Object.keys(by).map(id=>`- 發球者 ${nm(id)}：${by[id].n} 球拿下 ${by[id].w}（${P(by[id].w,by[id].n)}）`)); }
+      ...(seeP?Object.keys(by):[]).map(id=>`- 發球者 ${nm(id)}：${by[id].n} 球拿下 ${by[id].w}（${P(by[id].w,by[id].n)}）`)); }
   // 對手
   const op=all.filter(r=>realOpp(r.e));
   if(op.length){ const pts=op.filter(r=>!r.won), errs=op.filter(r=>r.won), t=(lst,kk)=>{ const m={}; lst.forEach(r=>{ const n=oppActName(kk,r.e.oppAct)||"未指定"; m[n]=(m[n]||0)+1; }); return m; };
@@ -3784,7 +3832,7 @@ function aiReport(o){
     const ns=notesOf(k).filter(x=>byId[x.match]&&(statsSet==="all"||Number(x.set)===statsSet)).sort((a,b)=>(a.t||0)-(b.t||0));
     const names=o.anon?ps.map(x=>[x.p.name,alias[x.p.id]]).concat(...ps.map(x=>(x.p.alias||[]).map(a=>[a,alias[x.p.id]]))).filter(([a])=>a&&a.length>1).sort((a,b)=>b[0].length-a[0].length):[];
     const clean=t=>names.reduce((s,[a,b])=>s.split(a).join(b),t);
-    if(ns.length) L.push(``,`## 比賽筆記`,...ns.map(x=>{ const sc=x.sc||{}; return `- ${matchLabel(byId[x.match])} 第${x.set}局${sc.us!=null?` ${sc.us}:${sc.them}`:""}${x.player?"・"+nm(x.player):""}：${clean(String(x.text||"").replace(/\s+/g," "))}`; }));
+    if(ns.length) L.push(``,`## 比賽筆記`,...ns.map(x=>{ const sc=x.sc||{}; return `- ${matchLabel(byId[x.match])} 第${x.set}局${sc.us!=null?` ${sc.us}:${sc.them}`:""}${x.player&&seeP?"・"+nm(x.player):""}：${clean(String(x.text||"").replace(/\s+/g," "))}`; }));
   }
   L.push(``,`（由 混排球員數據 匯出・Made by Shelly）`);
   return L.join("\n");
@@ -3795,8 +3843,9 @@ function aiRefresh(){
 }
 $("aiBtn").addEventListener("click",()=>{
   if(!statSnap) return;
-  const ps=vizData(statSnap.list,statSnap.evs);
-  if(!ps.length){ showToast("這個範圍還沒有紀錄"); return; }
+  const ps=canSeePlayers()?vizData(statSnap.list,statSnap.evs):[];
+  if(!statSnap.evs.length){ showToast("這個範圍還沒有紀錄"); return; }
+  $("aiFocusRow").hidden=$("aiAnonRow").hidden=!canSeePlayers();
   $("aiScope").textContent=`${teamOf(statSnap.k).name}・${statSnap.scope}（${statSnap.evs.length} 筆紀錄）`;
   $("aiFocus").innerHTML=`<option value="">全隊（每位隊員各給建議）</option>`+ps.map(x=>`<option value="${esc(x.p.id)}">重點分析：${esc(x.p.name)}</option>`).join("");
   $("aiShare").hidden=!navigator.share;
@@ -3819,7 +3868,7 @@ $("aiPrint").addEventListener("click",()=>{
   if(f) pvWho=f;
   const grab=(title,el)=>{ const c=el.cloneNode(true); c.querySelectorAll("[id]").forEach(n=>n.removeAttribute("id")); c.querySelectorAll("select").forEach(n=>n.remove());
     out.push(`<div class="box ana viz pr-sec"><div class="sec-h" style="margin-top:0"><h3>${esc(title)}</h3></div>${c.innerHTML}</div>`); };
-  const tabs=sel=>[...document.querySelectorAll(sel+" [data-a],"+sel+" [data-v]")].map(b=>[b.dataset.a||b.dataset.v,b.textContent]);
+  const tabs=sel=>[...document.querySelectorAll(sel+" [data-a],"+sel+" [data-v]")].filter(b=>!b.hidden).map(b=>[b.dataset.a||b.dataset.v,b.textContent]);
   if(!$("anaBox").hidden) tabs("#anaTabs").forEach(([v,n])=>{ anaTab=v; renderStats(); grab("分析・"+n,$("anaBody")); });
   if(!$("tvBox").hidden) tabs("#tvTabs").forEach(([v,n])=>{ tvTab=v; renderStats(); grab("團隊・"+n,$("tvBody")); });
   if(!$("pvBox").hidden) tabs("#pvTabs").forEach(([v,n])=>{ pvTab=v; renderStats(); grab(`個人・${(playerBy(pvWho)||{}).name||""}・${n}`,$("pvBody")); });
